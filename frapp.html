@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Makeup Face Filter App</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#cfe4ff, #ffffff);
+      color: black;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      padding: 35px;
+      gap: 45px;
+      align-items: center;
+    }
+
+    .filter-panel {
+      width: 280px;
+    }
+
+    .title {
+      display: inline-block;
+      background: #ffe84a;
+      padding: 8px 20px;
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-style: italic;
+      margin-bottom: 25px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 105px);
+      gap: 22px;
+    }
+
+    .filter-card {
+      width: 105px;
+      height: 105px;
+      border: 8px solid white;
+      border-radius: 12px;
+      background: #eee;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      line-height: 1.15;
+      color: #4d1834;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-card.active {
+      background: #ff74b8;
+      border-color: #4d1834;
+      color: white;
+      box-shadow: 0 8px 18px rgba(255, 105, 180, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .camera-section {
+      flex: 1;
+      text-align: center;
+    }
+
+    .camera-frame {
+      position: relative;
+      width: 640px;
+      height: 480px;
+      margin: auto;
+      border-radius: 50% 50% 35% 35%;
+      overflow: hidden;
+      background: white;
+      border: 10px solid white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    video, canvas {
+      position: absolute;
+      width: 640px;
+      height: 480px;
+      left: 0;
+      top: 0;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    video {
+      opacity: 0;
+    }
+
+    .start-btn {
+      margin-top: 20px;
+      padding: 14px 32px;
+      border-radius: 30px;
+      border: 2px solid black;
+      background: hotpink;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .slider-row {
+      width: min(420px, 90vw);
+      margin: 18px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: bold;
+    }
+
+    .slider-row input {
+      flex: 1;
+      accent-color: hotpink;
+      cursor: pointer;
+    }
+
+    .slider-row span {
+      width: 62px;
+      text-align: left;
+    }
+
+    #message {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .permission-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18, 22, 26, 0.48);
+      backdrop-filter: blur(3px);
+      padding: 24px;
+    }
+
+    .permission-overlay.show {
+      display: flex;
+    }
+
+    .permission-popup {
+      position: relative;
+      width: min(720px, 88vw);
+      min-height: 330px;
+      border: 4px solid #8e42ff;
+      background: #f4f4f4;
+      box-shadow: 0 6px 0 rgba(196, 189, 208, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 44px 44px 34px;
+    }
+
+    .permission-card {
+      width: 100%;
+      min-height: 250px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: inset 0 -7px 0 #ececec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 52px;
+      padding: 40px 32px 46px;
+    }
+
+    .permission-card p {
+      margin: 0;
+      max-width: 420px;
+      font-size: 33px;
+      line-height: 1.18;
+      text-align: center;
+      color: black;
+    }
+
+    .permission-card.terms {
+      gap: 22px;
+      align-items: stretch;
+      padding: 30px 32px 34px;
+    }
+
+    .permission-card.terms p {
+      max-width: none;
+      max-height: 178px;
+      overflow: auto;
+      padding: 0 10px 0 0;
+      font-size: 12px;
+      line-height: 1.32;
+      text-align: left;
+    }
+
+    .permission-card.terms .terms-title {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .permission-actions {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .permission-action {
+      min-width: 230px;
+      padding: 10px 34px;
+      border: 1.8px solid black;
+      border-radius: 999px;
+      background: #eee;
+      color: black;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .permission-action.deny {
+      background: black;
+      color: white;
+    }
+
+    .permission-cloud {
+      position: absolute;
+      left: -20px;
+      top: -64px;
+      width: 180px;
+      height: 112px;
+      filter: drop-shadow(0 12px 10px rgba(84, 91, 113, 0.25));
+    }
+
+    .cloud-part {
+      position: absolute;
+      background: #dde5f5;
+      border-radius: 50%;
+    }
+
+    .cloud-part.one {
+      width: 92px;
+      height: 92px;
+      left: 45px;
+      top: 10px;
+    }
+
+    .cloud-part.two {
+      width: 86px;
+      height: 72px;
+      left: 0;
+      top: 40px;
+    }
+
+    .cloud-part.three {
+      width: 78px;
+      height: 72px;
+      right: 0;
+      top: 42px;
+    }
+
+    .cloud-part.four {
+      width: 116px;
+      height: 52px;
+      left: 34px;
+      bottom: 0;
+      border-radius: 34px;
+    }
+
+    .cloud-face {
+      position: absolute;
+      left: 69px;
+      top: 38px;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .cloud-swirl {
+      position: absolute;
+      left: -20px;
+      top: -28px;
+      width: 115px;
+      height: 80px;
+      border: 2px solid white;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-16deg);
+      opacity: 0.95;
+    }
+
+    .cloud-swirl::before,
+    .cloud-swirl::after {
+      content: "";
+      position: absolute;
+      border: 2px solid white;
+      border-right-color: transparent;
+      border-radius: 50%;
+    }
+
+    .cloud-swirl::before {
+      width: 92px;
+      height: 60px;
+      left: 12px;
+      top: 9px;
+    }
+
+    .cloud-swirl::after {
+      width: 68px;
+      height: 42px;
+      left: 25px;
+      top: 19px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="filter-panel">
+      <div class="title">[make-up looks]</div>
+
+      <div class="filter-grid">
+        <button class="filter-card active" data-filter="softGlam" onclick="requestFaceAnalysis('softGlam')">SOFT<br>GLAM</button>
+        <button class="filter-card" data-filter="redLip" onclick="requestFaceAnalysis('redLip')">RED<br>LIP</button>
+        <button class="filter-card" data-filter="plumpLip" onclick="requestFaceAnalysis('plumpLip')">PLUMP<br>LIP</button>
+        <button class="filter-card" data-filter="bigEyes" onclick="requestFaceAnalysis('bigEyes')">BIG<br>EYES</button>
+        <button class="filter-card" data-filter="natural" onclick="requestFaceAnalysis('natural')">NATURAL<br>MAKEUP</button>
+        <button class="filter-card" data-filter="glow" onclick="requestFaceAnalysis('glow')">GLOW<br>BLUSH</button>
+        <button class="filter-card" data-filter="smoothSkin" onclick="requestFaceAnalysis('smoothSkin')">SMOOTH<br>SKIN</button>
+        <button class="filter-card" data-filter="none" onclick="requestFaceAnalysis('none')">NO<br>FILTER</button>
+      </div>
+    </aside>
+
+    <main class="camera-section">
+      <div class="camera-frame">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <p id="message">Click Start Camera</p>
+      <label class="slider-row">
+        <span>Lips</span>
+        <input id="lipSize" type="range" min="0" max="100" value="0" />
+      </label>
+      <label class="slider-row">
+        <span>Eyes</span>
+        <input id="eyeSize" type="range" min="0" max="100" value="0" />
+      </label>
+      <label class="slider-row">
+        <span>Face</span>
+        <input id="faceSize" type="range" min="0" max="100" value="35" />
+      </label>
+      <button class="start-btn" onclick="startCamera()">📷 Start Camera</button>
+    </main>
+  </div>
+
+  <div class="permission-overlay" id="permissionOverlay" aria-hidden="true">
+    <div class="permission-popup" role="dialog" aria-modal="true" aria-labelledby="permissionTitle">
+      <div class="permission-cloud" aria-hidden="true">
+        <div class="cloud-swirl"></div>
+        <span class="cloud-part one"></span>
+        <span class="cloud-part two"></span>
+        <span class="cloud-part three"></span>
+        <span class="cloud-part four"></span>
+        <span class="cloud-face">👀<br>👄</span>
+      </div>
+
+      <div class="permission-card">
+        <p id="permissionTitle">do you want to allow<br>webcam access?</p>
+        <div class="permission-actions">
+          <button class="permission-action" id="allowCamera" type="button">allow</button>
+          <button class="permission-action deny" id="denyCamera" type="button">don't allow</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      FaceLandmarker,
+      FilesetResolver
+    } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const sourceCanvas = document.createElement("canvas");
+    const sourceCtx = sourceCanvas.getContext("2d");
+    const message = document.getElementById("message");
+    const lipSize = document.getElementById("lipSize");
+    const eyeSize = document.getElementById("eyeSize");
+    const faceSize = document.getElementById("faceSize");
+    const filterCards = document.querySelectorAll(".filter-card");
+    const permissionOverlay = document.getElementById("permissionOverlay");
+    const permissionCard = document.querySelector(".permission-card");
+    const permissionTitle = document.getElementById("permissionTitle");
+    const allowCamera = document.getElementById("allowCamera");
+    const denyCamera = document.getElementById("denyCamera");
+
+    canvas.width = 640;
+    canvas.height = 480;
+    sourceCanvas.width = canvas.width;
+    sourceCanvas.height = canvas.height;
+
+    let faceLandmarker;
+    let faceLandmarkerPromise;
+    let currentFilter = "softGlam";
+    let lastFaceLandmarks = null;
+    let lipPlumpAmount = Number(lipSize.value) / 100;
+    let eyeScaleAmount = Number(eyeSize.value) / 100;
+    let faceSlimAmount = Number(faceSize.value) / 100;
+    let lastVideoTime = -1;
+    let isRunning = false;
+    let isStarting = false;
+    let permissionMode = "camera";
+    let pendingFilter = null;
+    let lastDetectionTime = 0;
+    const detectionInterval = 1000 / 15;
+
+    window.setFilter = function(filter) {
+      currentFilter = filter;
+      filterCards.forEach((card) => {
+        card.classList.toggle("active", card.dataset.filter === filter);
+      });
+    };
+
+    function showPermissionPopup(mode, filter = null) {
+      permissionMode = mode;
+      pendingFilter = filter;
+      permissionCard.classList.toggle("terms", mode === "face");
+      permissionTitle.innerHTML = mode === "camera"
+        ? "do you want to allow<br>webcam access?"
+        : getFilterPermissionText(filter);
+      permissionOverlay.classList.add("show");
+      permissionOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function getFilterPermissionText(filter) {
+      const permissionText = {
+        softGlam: "Face Shaping",
+        redLip: "Lip Recognition",
+        plumpLip: "Lip Analysis",
+        bigEyes: "Image Processing",
+        natural: "Makeup Tracking",
+        glow: "Skin Glow Analysis",
+        smoothSkin: "Skin Smoothing",
+        none: "Clear Face Effects"
+      };
+
+      const title = permissionText[filter] || "Face Analysis";
+
+      return `
+        <span class="terms-title">do you want to allow ${title.toLowerCase()}?</span>
+        By tapping allow, you confirm that you have read every tiny line of this completely serious-looking but test-only filter notice. The selected beauty effect may inspect facial landmarks, cheeks, lips, eyelids, eyebrows, jaw position, face outline, skin tone, makeup placement, expression changes, and approximate head pose while the camera is running. This analysis happens locally in this demo page for the purpose of drawing the filter effect on your face.
+        <br><br>
+        Please continue reading carefully. Are you from Netherlands or Eindhoven? If yes, no, maybe, or if you once passed through Eindhoven Centraal, you still agree that this sentence was placed here to check whether the user is actually reading instead of instantly clicking allow. You also acknowledge that the words face recognition, lip recognition, image processing, skin smoothing, poster permission, advertising permission, pose tool, cloud access, glam mode, soft contour, and virtual lipstick may appear in this agreement in confusing order.
+        <br><br>
+        For testing purposes only, this text says that you allow your face, filter result, makeup preview, transformed lips, enlarged eyes, smoothed skin, and dramatic before-and-after screenshot to be hypothetically used on different posters, ads, banners, classroom slides, fake product campaigns, imaginary bus stops, digital billboards, mall screens, sticker packs, and other blah blah promotional materials. This app does not actually upload or publish those images; this paragraph is intentionally over-the-top test copy.
+        <br><br>
+        You understand that choosing allow only activates the selected filter in this browser session. Choosing don't allow keeps the current look unchanged. You further confirm that you have noticed this long paragraph, the Netherlands/Eindhoven question, the posters and ads wording, and the fact that the buttons below still look very easy to click even though this text is deliberately small.
+      `;
+    }
+
+    function hidePermissionPopup() {
+      permissionOverlay.classList.remove("show");
+      permissionOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    window.requestFaceAnalysis = function(filter) {
+      showPermissionPopup("face", filter);
+    };
+
+    function syncSliderValues() {
+      lipPlumpAmount = Number(lipSize.value) / 100;
+      eyeScaleAmount = Number(eyeSize.value) / 100;
+      faceSlimAmount = Number(faceSize.value) / 100;
+    }
+
+    lipSize.addEventListener("input", syncSliderValues);
+    lipSize.addEventListener("change", syncSliderValues);
+    eyeSize.addEventListener("input", syncSliderValues);
+    eyeSize.addEventListener("change", syncSliderValues);
+    faceSize.addEventListener("input", syncSliderValues);
+    faceSize.addEventListener("change", syncSliderValues);
+
+    syncSliderValues();
+
+    window.startCamera = function() {
+      if (isRunning || isStarting) return;
+      showPermissionPopup("camera");
+    };
+
+    allowCamera.addEventListener("click", () => {
+      hidePermissionPopup();
+
+      if (permissionMode === "face" && pendingFilter) {
+        window.setFilter(pendingFilter);
+        pendingFilter = null;
+        return;
+      }
+
+      startCameraStream();
+    });
+
+    denyCamera.addEventListener("click", () => {
+      hidePermissionPopup();
+
+      if (permissionMode === "camera") {
+        message.textContent = "Camera not started.";
+      }
+
+      pendingFilter = null;
+    });
+
+    permissionOverlay.addEventListener("click", (event) => {
+      if (event.target === permissionOverlay) {
+        hidePermissionPopup();
+        pendingFilter = null;
+      }
+    });
+
+    async function startCameraStream() {
+      if (isRunning || isStarting) return;
+      isStarting = true;
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Camera API is not available in this browser.");
+        }
+
+        if (!window.isSecureContext) {
+          throw new Error("Camera access needs http://localhost or https://.");
+        }
+
+        message.textContent = "Opening camera...";
+
+        const stream = await openCamera();
+
+        video.srcObject = stream;
+        await waitForVideo();
+
+        message.textContent = "Loading face detector...";
+
+        faceLandmarker = await loadFaceLandmarker();
+
+        isRunning = true;
+        message.textContent = "Camera working. Choose a filter!";
+        detectFace();
+
+      } catch (error) {
+        console.error(error);
+        message.textContent = getCameraErrorMessage(error);
+      } finally {
+        isStarting = false;
+      }
+    }
+
+    async function openCamera() {
+      const cameraOptions = [
+        {
+          video: {
+            width: { ideal: 480 },
+            height: { ideal: 360 },
+            frameRate: { ideal: 24, max: 30 },
+            facingMode: "user"
+          },
+          audio: false
+        },
+        {
+          video: {
+            facingMode: "user"
+          },
+          audio: false
+        },
+        {
+          video: true,
+          audio: false
+        }
+      ];
+
+      let lastError;
+
+      for (const options of cameraOptions) {
+        try {
+          return await navigator.mediaDevices.getUserMedia(options);
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      throw lastError;
+    }
+
+    async function waitForVideo() {
+      if (video.readyState < 2) {
+        await new Promise((resolve) => {
+          video.onloadedmetadata = resolve;
+        });
+      }
+
+      await video.play();
+    }
+
+    function loadFaceLandmarker() {
+      if (!faceLandmarkerPromise) {
+        faceLandmarkerPromise = (async () => {
+          const filesetResolver = await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+          );
+
+          try {
+            return await createFaceLandmarker(filesetResolver, "GPU");
+          } catch (error) {
+            console.warn("GPU face detector failed, using CPU:", error);
+            return await createFaceLandmarker(filesetResolver, "CPU");
+          }
+        })();
+      }
+
+      return faceLandmarkerPromise;
+    }
+
+    function createFaceLandmarker(filesetResolver, delegate) {
+      return FaceLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task",
+          delegate
+        },
+        runningMode: "VIDEO",
+        numFaces: 1
+      });
+    }
+
+    function getCameraErrorMessage(error) {
+      if (error.name === "NotAllowedError") {
+        return "Camera blocked. Allow camera permission in the browser.";
+      }
+
+      if (error.name === "NotFoundError") {
+        return "No camera found on this device.";
+      }
+
+      if (!window.isSecureContext) {
+        return "Open this with Live Server or http://localhost so the browser allows camera.";
+      }
+
+      return "Camera failed. Allow camera access and try again.";
+    }
+
+    function getPoint(landmarks, index) {
+      return {
+        x: landmarks[index].x * canvas.width,
+        y: landmarks[index].y * canvas.height
+      };
+    }
+
+    const upperLip = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 78];
+    const lowerLip = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95, 78];
+    const leftEye = [33, 246, 161, 160, 159, 158, 157, 173, 133, 155, 154, 153, 145, 144, 163, 7];
+    const rightEye = [263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373, 390, 249];
+    const leftBrow = [70, 63, 105, 66, 107, 55, 65, 52, 53, 46];
+    const rightBrow = [336, 296, 334, 293, 300, 276, 283, 282, 295, 285];
+    const faceOval = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
+
+    function getPoints(landmarks, indexes) {
+      return indexes.map((index) => getPoint(landmarks, index));
+    }
+
+    function getCenter(points) {
+      return points.reduce(
+        (center, point) => ({
+          x: center.x + point.x / points.length,
+          y: center.y + point.y / points.length
+        }),
+        { x: 0, y: 0 }
+      );
+    }
+
+    function scalePoints(points, scaleX, scaleY = scaleX) {
+      const center = getCenter(points);
+
+      return points.map((point) => ({
+        x: center.x + (point.x - center.x) * scaleX,
+        y: center.y + (point.y - center.y) * scaleY
+      }));
+    }
+
+    function drawClosedShape(points, fillStyle) {
+      if (points.length < 3) return;
+
+      ctx.fillStyle = fillStyle;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 1; i < points.length; i += 1) {
+        const previous = points[i - 1];
+        const current = points[i];
+        ctx.quadraticCurveTo(
+          previous.x,
+          previous.y,
+          (previous.x + current.x) / 2,
+          (previous.y + current.y) / 2
+        );
+      }
+
+      ctx.quadraticCurveTo(
+        points[points.length - 1].x,
+        points[points.length - 1].y,
+        points[0].x,
+        points[0].y
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawStroke(points, color, width) {
+      if (points.length < 2) return;
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 1; i < points.length; i += 1) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+
+      ctx.stroke();
+    }
+
+    function drawSoftEllipse(center, radiusX, radiusY, rotation, color, blur = 18) {
+      ctx.save();
+      ctx.filter = `blur(${blur}px)`;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, radiusX, radiusY, rotation, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCameraFrame() {
+      if (video.readyState < 2) return;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      sourceCtx.drawImage(canvas, 0, 0);
+    }
+
+    function getBounds(points, padding = 0) {
+      const xs = points.map((point) => point.x);
+      const ys = points.map((point) => point.y);
+
+      return {
+        left: Math.max(0, Math.min(...xs) - padding),
+        top: Math.max(0, Math.min(...ys) - padding),
+        right: Math.min(canvas.width, Math.max(...xs) + padding),
+        bottom: Math.min(canvas.height, Math.max(...ys) + padding)
+      };
+    }
+
+    function clipToShapes(shapes) {
+      ctx.beginPath();
+
+      shapes.forEach((points) => {
+        if (points.length < 3) return;
+
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i += 1) {
+          ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+      });
+
+      ctx.clip();
+    }
+
+    function magnifyFeature(points, amount, options = {}) {
+      if (amount <= 0.03 || video.videoWidth === 0 || video.videoHeight === 0) return;
+
+      const paddingX = options.paddingX ?? 18;
+      const paddingY = options.paddingY ?? 12;
+      const scaleXAmount = options.scaleXAmount ?? 0.45;
+      const scaleYAmount = options.scaleYAmount ?? 0.55;
+      const clipScaleX = options.clipScaleX ?? 1.18;
+      const clipScaleY = options.clipScaleY ?? 1.15;
+      const bounds = getBounds(points, 0);
+      const sourceBounds = {
+        left: Math.max(0, bounds.left - paddingX),
+        top: Math.max(0, bounds.top - paddingY),
+        right: Math.min(canvas.width, bounds.right + paddingX),
+        bottom: Math.min(canvas.height, bounds.bottom + paddingY)
+      };
+      const center = {
+        x: (sourceBounds.left + sourceBounds.right) / 2,
+        y: (sourceBounds.top + sourceBounds.bottom) / 2
+      };
+      const sourceWidth = sourceBounds.right - sourceBounds.left;
+      const sourceHeight = sourceBounds.bottom - sourceBounds.top;
+      const scaleX = 1 + amount * scaleXAmount;
+      const scaleY = 1 + amount * scaleYAmount;
+      const destination = {
+        left: center.x - (sourceWidth * scaleX) / 2,
+        top: center.y - (sourceHeight * scaleY) / 2,
+        right: center.x + (sourceWidth * scaleX) / 2,
+        bottom: center.y + (sourceHeight * scaleY) / 2
+      };
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(
+        center.x,
+        center.y,
+        (sourceWidth * clipScaleX) / 2,
+        (sourceHeight * clipScaleY) / 2,
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.clip();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(
+        sourceCanvas,
+        sourceBounds.left,
+        sourceBounds.top,
+        sourceWidth,
+        sourceHeight,
+        destination.left,
+        destination.top,
+        destination.right - destination.left,
+        destination.bottom - destination.top
+      );
+      ctx.restore();
+    }
+
+    function drawPlumpLipWarp(landmarks) {
+      const amount = lipPlumpAmount * 0.45;
+      if (amount <= 0.03) return;
+
+      const upper = getPoints(landmarks, upperLip);
+      const lower = getPoints(landmarks, lowerLip);
+      const lips = [...upper, ...lower];
+      const sourceBounds = getBounds(lips, 3);
+      const center = {
+        x: (sourceBounds.left + sourceBounds.right) / 2,
+        y: (sourceBounds.top + sourceBounds.bottom) / 2
+      };
+      const width = sourceBounds.right - sourceBounds.left;
+      const height = sourceBounds.bottom - sourceBounds.top;
+      const scaleX = 1 + amount * 0.28;
+      const scaleY = 1 + amount * 0.38;
+      const destination = {
+        left: center.x - (width * scaleX) / 2,
+        top: center.y - (height * scaleY) / 2,
+        right: center.x + (width * scaleX) / 2,
+        bottom: center.y + (height * scaleY) / 2
+      };
+
+      ctx.save();
+      clipToShapes([
+        scalePoints(upper, scaleX * 1.01, scaleY * 1.02),
+        scalePoints(lower, scaleX * 1.01, scaleY * 1.03)
+      ]);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(
+        sourceCanvas,
+        sourceBounds.left,
+        sourceBounds.top,
+        width,
+        height,
+        destination.left,
+        destination.top,
+        destination.right - destination.left,
+        destination.bottom - destination.top
+      );
+      ctx.restore();
+    }
+
+    function drawEyeWarp(landmarks) {
+      const amount = eyeScaleAmount * 0.4;
+
+      magnifyFeature(getPoints(landmarks, leftEye), amount, {
+        paddingX: 9,
+        paddingY: 7,
+        scaleXAmount: 0.18,
+        scaleYAmount: 0.24,
+        clipScaleX: 1.02,
+        clipScaleY: 1.05
+      });
+      magnifyFeature(getPoints(landmarks, rightEye), amount, {
+        paddingX: 9,
+        paddingY: 7,
+        scaleXAmount: 0.18,
+        scaleYAmount: 0.24,
+        clipScaleX: 1.02,
+        clipScaleY: 1.05
+      });
+    }
+
+    function drawLipstick(landmarks, color, scale = 1) {
+      const upper = scalePoints(getPoints(landmarks, upperLip), scale, scale * 1.08);
+      const lower = scalePoints(getPoints(landmarks, lowerLip), scale, scale * 1.12);
+
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      drawClosedShape(upper, color);
+      drawClosedShape(lower, color);
+
+      const shine = getPoint(landmarks, 13);
+      drawSoftEllipse(
+        { x: shine.x, y: shine.y + 9 },
+        22 * scale,
+        4 * scale,
+        0,
+        "rgba(255, 255, 255, 0.08)",
+        7
+      );
+      ctx.restore();
+    }
+
+    function drawPlumpLipEffect(landmarks) {
+      const amount = lipPlumpAmount * 0.6;
+      const outerScaleX = 1.02 + amount * 0.18;
+      const upperOuterScaleY = 1.04 + amount * 0.32;
+      const lowerOuterScaleY = 1.05 + amount * 0.42;
+      const innerScaleX = 1.01 + amount * 0.24;
+      const upperInnerScaleY = 1.03 + amount * 0.32;
+      const lowerInnerScaleY = 1.04 + amount * 0.42;
+      const upperOuter = scalePoints(getPoints(landmarks, upperLip), outerScaleX, upperOuterScaleY);
+      const lowerOuter = scalePoints(getPoints(landmarks, lowerLip), outerScaleX, lowerOuterScaleY);
+      const upperInner = scalePoints(getPoints(landmarks, upperLip), innerScaleX, upperInnerScaleY);
+      const lowerInner = scalePoints(getPoints(landmarks, lowerLip), innerScaleX, lowerInnerScaleY);
+      const mouthCenter = getPoint(landmarks, 13);
+      const bottomLip = getPoint(landmarks, 14);
+      const opacity = 0.025 + amount * 0.045;
+
+      ctx.save();
+      ctx.filter = "blur(2px)";
+      drawClosedShape(upperOuter, `rgba(138, 28, 61, ${opacity})`);
+      drawClosedShape(lowerOuter, `rgba(138, 28, 61, ${opacity})`);
+      ctx.restore();
+
+      ctx.save();
+      drawClosedShape(upperInner, `rgba(176, 62, 88, ${0.1 + amount * 0.11})`);
+      drawClosedShape(lowerInner, `rgba(176, 62, 88, ${0.1 + amount * 0.11})`);
+
+      ctx.strokeStyle = "rgba(87, 16, 42, 0.07)";
+      ctx.lineWidth = 1;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(mouthCenter.x - (28 + amount * 32), mouthCenter.y + 3);
+      ctx.quadraticCurveTo(
+        mouthCenter.x,
+        mouthCenter.y + 6 + amount * 6,
+        mouthCenter.x + 28 + amount * 32,
+        mouthCenter.y + 3
+      );
+      ctx.stroke();
+
+      drawSoftEllipse(
+        { x: bottomLip.x, y: bottomLip.y - 3 },
+        24 + amount * 28,
+        4 + amount * 7,
+        0,
+        `rgba(255, 205, 214, ${0.04 + amount * 0.05})`,
+        8
+      );
+      ctx.restore();
+    }
+
+    function drawBlushAndContour(landmarks, strength = 1) {
+      const leftCheek = getPoint(landmarks, 205);
+      const rightCheek = getPoint(landmarks, 425);
+      const leftJaw = getPoint(landmarks, 234);
+      const rightJaw = getPoint(landmarks, 454);
+
+      drawSoftEllipse(leftCheek, 48, 24, -0.2, `rgba(235, 86, 125, ${0.22 * strength})`, 16);
+      drawSoftEllipse(rightCheek, 48, 24, 0.2, `rgba(235, 86, 125, ${0.22 * strength})`, 16);
+      drawSoftEllipse(leftJaw, 54, 12, 0.55, `rgba(122, 69, 52, ${0.13 * strength})`, 20);
+      drawSoftEllipse(rightJaw, 54, 12, -0.55, `rgba(122, 69, 52, ${0.13 * strength})`, 20);
+    }
+
+    function drawFaceSlimming(landmarks) {
+      const amount = faceSlimAmount;
+      if (amount <= 0.02) return;
+
+      const leftJaw = getPoint(landmarks, 234);
+      const rightJaw = getPoint(landmarks, 454);
+      const leftCheek = getPoint(landmarks, 205);
+      const rightCheek = getPoint(landmarks, 425);
+      const chin = getPoint(landmarks, 152);
+      const nose = getPoint(landmarks, 1);
+      const faceWidth = Math.abs(rightJaw.x - leftJaw.x);
+      const faceTop = getPoint(landmarks, 10);
+      const faceBottom = getPoint(landmarks, 152);
+      const centerX = (leftJaw.x + rightJaw.x) / 2;
+      const centerY = (faceTop.y + faceBottom.y) / 2;
+      const radiusX = faceWidth * 0.48;
+      const radiusY = Math.abs(faceBottom.y - faceTop.y) * 0.52;
+      const strength = amount * 0.18;
+      const rawBounds = getBounds(getPoints(landmarks, faceOval), 4);
+      const bounds = {
+        left: Math.floor(rawBounds.left),
+        top: Math.floor(rawBounds.top),
+        right: Math.ceil(rawBounds.right),
+        bottom: Math.ceil(rawBounds.bottom)
+      };
+      const source = sourceCtx.getImageData(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+      const output = ctx.getImageData(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+      const width = source.width;
+      const height = source.height;
+
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const canvasX = bounds.left + x;
+          const canvasY = bounds.top + y;
+          const nx = (canvasX - centerX) / radiusX;
+          const ny = (canvasY - centerY) / radiusY;
+          const distance = nx * nx + ny * ny;
+
+          if (distance > 1 || canvasY < nose.y - faceWidth * 0.05) continue;
+
+          const lowerFace = Math.min(1, Math.max(0, (canvasY - nose.y) / (chin.y - nose.y)));
+          const sideFalloff = Math.min(1, Math.abs(nx) * 1.45);
+          const warp = strength * lowerFace * sideFalloff * (1 - distance * 0.35);
+          const sampleX = centerX + (canvasX - centerX) / Math.max(0.72, 1 - warp);
+          const localSampleX = Math.round(sampleX - bounds.left);
+
+          if (localSampleX < 0 || localSampleX >= width) continue;
+
+          const sourceIndex = (y * width + localSampleX) * 4;
+          const outputIndex = (y * width + x) * 4;
+          output.data[outputIndex] = source.data[sourceIndex];
+          output.data[outputIndex + 1] = source.data[sourceIndex + 1];
+          output.data[outputIndex + 2] = source.data[sourceIndex + 2];
+          output.data[outputIndex + 3] = source.data[sourceIndex + 3];
+        }
+      }
+
+      ctx.putImageData(output, bounds.left, bounds.top);
+      sourceCtx.drawImage(canvas, 0, 0);
+
+      const shadowAlpha = 0.018 + amount * 0.045;
+      const highlightAlpha = 0.025 + amount * 0.05;
+
+      drawSoftEllipse(
+        { x: leftCheek.x - faceWidth * 0.04, y: leftCheek.y + 28 },
+        faceWidth * 0.12,
+        faceWidth * 0.34,
+        0.28,
+        `rgba(86, 52, 46, ${shadowAlpha})`,
+        18
+      );
+      drawSoftEllipse(
+        { x: rightCheek.x + faceWidth * 0.04, y: rightCheek.y + 28 },
+        faceWidth * 0.12,
+        faceWidth * 0.34,
+        -0.28,
+        `rgba(86, 52, 46, ${shadowAlpha})`,
+        18
+      );
+      drawSoftEllipse(
+        { x: chin.x, y: chin.y - 18 },
+        faceWidth * 0.18,
+        faceWidth * 0.08,
+        0,
+        `rgba(95, 57, 49, ${shadowAlpha * 0.55})`,
+        16
+      );
+      drawSoftEllipse(
+        { x: nose.x, y: (nose.y + chin.y) / 2 },
+        faceWidth * 0.18,
+        faceWidth * 0.32,
+        0,
+        `rgba(255, 229, 215, ${highlightAlpha})`,
+        22
+      );
+    }
+
+    function drawSmoothSkin(landmarks) {
+      const face = scalePoints(getPoints(landmarks, faceOval), 0.92, 0.96);
+      const eyesAndLips = [
+        scalePoints(getPoints(landmarks, leftEye), 1.25, 1.45),
+        scalePoints(getPoints(landmarks, rightEye), 1.25, 1.45),
+        scalePoints(getPoints(landmarks, leftBrow), 1.35, 1.8),
+        scalePoints(getPoints(landmarks, rightBrow), 1.35, 1.8),
+        scalePoints(getPoints(landmarks, upperLip), 1.25, 1.5),
+        scalePoints(getPoints(landmarks, lowerLip), 1.25, 1.5)
+      ];
+
+      ctx.save();
+      ctx.beginPath();
+      [face, ...eyesAndLips].forEach((shape) => {
+        if (shape.length < 3) return;
+
+        ctx.moveTo(shape[0].x, shape[0].y);
+        for (let i = 1; i < shape.length; i += 1) {
+          ctx.lineTo(shape[i].x, shape[i].y);
+        }
+        ctx.closePath();
+      });
+      ctx.clip("evenodd");
+      ctx.filter = "blur(4px)";
+      ctx.globalAlpha = 0.42;
+      ctx.drawImage(sourceCanvas, 0, 0);
+      ctx.restore();
+
+      ctx.save();
+      clipToShapes(eyesAndLips);
+      ctx.globalAlpha = 0.96;
+      ctx.drawImage(sourceCanvas, 0, 0);
+      ctx.restore();
+
+      drawSoftEllipse(getPoint(landmarks, 5), 90, 55, 0, "rgba(255, 224, 214, 0.08)", 24);
+      drawSoftEllipse(getPoint(landmarks, 10), 72, 34, 0, "rgba(255, 255, 255, 0.035)", 22);
+    }
+
+    function drawEyeMakeup(landmarks, intensity = 1, makeBigger = false) {
+      drawOneEye(landmarks, leftEye, intensity, makeBigger);
+      drawOneEye(landmarks, rightEye, intensity, makeBigger);
+    }
+
+    function drawSoftGlamEyeMakeup(landmarks) {
+      drawSoftGlamEye(landmarks, leftEye);
+      drawSoftGlamEye(landmarks, rightEye);
+    }
+
+    function drawSoftGlamEye(landmarks, indexes) {
+      const eye = getPoints(landmarks, indexes);
+      const center = getCenter(eye);
+      const top = eye.slice(1, 9);
+      const bottom = eye.slice(9);
+      const width = Math.abs(eye[0].x - eye[8].x);
+      const direction = eye[0].x < center.x ? -1 : 1;
+      const outerCorner = eye[0];
+
+      drawSoftEllipse(
+        { x: center.x, y: center.y - width * 0.26 },
+        width * 0.72,
+        width * 0.34,
+        0,
+        "rgba(123, 78, 52, 0.28)",
+        10
+      );
+      drawSoftEllipse(
+        { x: center.x + direction * width * 0.15, y: center.y - width * 0.22 },
+        width * 0.5,
+        width * 0.22,
+        0,
+        "rgba(76, 45, 34, 0.24)",
+        9
+      );
+      drawSoftEllipse(
+        { x: center.x - direction * width * 0.16, y: center.y - width * 0.14 },
+        width * 0.28,
+        width * 0.12,
+        0,
+        "rgba(204, 149, 95, 0.16)",
+        8
+      );
+
+      drawStroke(top, "rgba(45, 29, 24, 0.42)", 2);
+      drawStroke(bottom, "rgba(78, 48, 38, 0.1)", 1);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(45, 29, 24, 0.44)";
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(outerCorner.x, outerCorner.y);
+      ctx.quadraticCurveTo(
+        outerCorner.x + direction * width * 0.16,
+        outerCorner.y - width * 0.08,
+        outerCorner.x + direction * width * 0.28,
+        outerCorner.y - width * 0.18
+      );
+      ctx.stroke();
+      ctx.restore();
+
+      drawNaturalLashes(top, center, width, 0.75, true);
+    }
+
+    function drawOneEye(landmarks, indexes, intensity, makeBigger) {
+      const eye = getPoints(landmarks, indexes);
+      const center = getCenter(eye);
+      const outer = scalePoints(eye, makeBigger ? 1.07 : 1.04, makeBigger ? 1.12 : 1.04);
+      const top = eye.slice(1, 9);
+      const bottom = eye.slice(9);
+      const width = Math.abs(eye[0].x - eye[8].x);
+
+      if (makeBigger) {
+        drawClosedShape(outer, `rgba(255, 255, 255, ${0.04 * intensity})`);
+      }
+
+      drawSoftEllipse(
+        { x: center.x, y: center.y - width * 0.18 },
+        width * 0.55,
+        width * 0.23,
+        0,
+        `rgba(126, 83, 123, ${0.07 * intensity})`,
+        12
+      );
+
+      drawStroke(top, `rgba(28, 18, 24, ${0.34 * intensity})`, makeBigger ? 2.4 : 2);
+      drawStroke(bottom, `rgba(93, 55, 78, ${0.1 * intensity})`, 1.4);
+
+      drawNaturalLashes(top, center, width, intensity, makeBigger);
+
+      const highlightX = center.x - width * 0.12;
+      ctx.fillStyle = `rgba(255, 255, 255, ${makeBigger ? 0.18 : 0.14})`;
+      ctx.beginPath();
+      ctx.ellipse(highlightX, center.y - 2, width * 0.06, width * 0.04, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawNaturalLashes(top, center, eyeWidth, intensity, makeBigger) {
+      const outerLid = top.slice(0, 4);
+      const direction = outerLid[0].x < center.x ? -1 : 1;
+      const lashCount = makeBigger ? 4 : 3;
+      const baseLength = eyeWidth * (makeBigger ? 0.09 : 0.07);
+
+      ctx.save();
+      ctx.strokeStyle = `rgba(30, 20, 26, ${0.18 * intensity})`;
+      ctx.lineCap = "round";
+      ctx.lineWidth = makeBigger ? 1 : 0.8;
+
+      for (let i = 0; i < lashCount; i += 1) {
+        const point = outerLid[i];
+        const length = baseLength * (1 - i * 0.14);
+        const lift = length * (0.95 - i * 0.08);
+
+        ctx.beginPath();
+        ctx.moveTo(point.x, point.y + 1);
+        ctx.quadraticCurveTo(
+          point.x + direction * length * 0.45,
+          point.y - lift * 0.45,
+          point.x + direction * length,
+          point.y - lift
+        );
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawNaturalMakeup(landmarks) {
+      drawBlushAndContour(landmarks, 0.55);
+      drawLipstick(landmarks, "rgba(155, 66, 80, 0.2)", 1.01);
+      drawEyeMakeup(landmarks, 0.42, false);
+    }
+
+    function drawSoftGlam(landmarks) {
+      drawFaceSlimming(landmarks);
+      drawBlushAndContour(landmarks, 0.65);
+      drawLipstick(landmarks, "rgba(172, 47, 78, 0.28)", 1.02);
+      drawSoftGlamEyeMakeup(landmarks);
+    }
+
+    function drawRedLip(landmarks) {
+      drawBlushAndContour(landmarks, 0.45);
+      drawLipstick(landmarks, "rgba(150, 44, 63, 0.28)", 1.01);
+      drawEyeMakeup(landmarks, 0.42, false);
+    }
+
+    function drawPlumpLip(landmarks) {
+      drawBlushAndContour(landmarks, 0.45);
+      drawPlumpLipEffect(landmarks);
+      drawEyeMakeup(landmarks, 0.38, false);
+    }
+
+    function drawBigEyes(landmarks) {
+      drawBlushAndContour(landmarks, 0.45);
+      drawLipstick(landmarks, "rgba(154, 61, 79, 0.18)", 1.01);
+      drawEyeMakeup(landmarks, 0.55, true);
+    }
+
+    function drawGlow(landmarks) {
+      drawBlushAndContour(landmarks, 0.8);
+      drawLipstick(landmarks, "rgba(170, 74, 95, 0.16)", 1.01);
+    }
+
+    function drawSmoothSkinLook(landmarks) {
+      drawSmoothSkin(landmarks);
+    }
+
+    function drawFilter(landmarks) {
+      if (currentFilter !== "none" && currentFilter !== "smoothSkin") {
+        drawPlumpLipWarp(landmarks);
+        drawEyeWarp(landmarks);
+      }
+
+      if (currentFilter === "softGlam") drawSoftGlam(landmarks);
+      if (currentFilter === "redLip") drawRedLip(landmarks);
+      if (currentFilter === "plumpLip") drawPlumpLip(landmarks);
+      if (currentFilter === "bigEyes") drawBigEyes(landmarks);
+      if (currentFilter === "natural") drawNaturalMakeup(landmarks);
+      if (currentFilter === "glow") drawGlow(landmarks);
+      if (currentFilter === "smoothSkin") drawSmoothSkinLook(landmarks);
+    }
+
+    function detectFace(now = performance.now()) {
+      if (!isRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawCameraFrame();
+
+      try {
+        if (
+          faceLandmarker &&
+          video.readyState >= 2 &&
+          video.currentTime !== lastVideoTime &&
+          now - lastDetectionTime >= detectionInterval
+        ) {
+          lastVideoTime = video.currentTime;
+          lastDetectionTime = now;
+
+          const results = faceLandmarker.detectForVideo(
+            video,
+            now
+          );
+
+          if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+            lastFaceLandmarks = results.faceLandmarks[0];
+          } else {
+            lastFaceLandmarks = null;
+          }
+        }
+
+        if (lastFaceLandmarks) {
+          syncSliderValues();
+          drawFilter(lastFaceLandmarks);
+        }
+      } catch (error) {
+        console.log("Skipped frame:", error);
+      }
+
+      requestAnimationFrame(detectFace);
+    }
+  </script>
+</body>
+
+</html>
+m
