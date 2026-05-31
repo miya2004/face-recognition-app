@@ -50,6 +50,14 @@
       padding: clamp(36px, 7vw, 116px);
     }
 
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: grid;
+    }
+
     .intro {
       position: relative;
       z-index: 2;
@@ -118,6 +126,11 @@
       outline: none;
     }
 
+    .ready-link.dark {
+      background: #050505;
+      color: #fff;
+    }
+
     .cloud-stage {
       position: relative;
       z-index: 1;
@@ -125,6 +138,15 @@
       width: min(640px, 45vw);
       aspect-ratio: 1.18;
       min-width: 360px;
+    }
+
+    .cloud-stage.small {
+      width: min(250px, 44vw);
+      min-width: 150px;
+    }
+
+    .cloud-stage.small .contour {
+      border-width: 2px;
     }
 
     .contour {
@@ -254,8 +276,170 @@
       box-shadow: inset 0 -7px 6px rgba(78, 0, 13, 0.26), 0 5px 5px rgba(0, 0, 0, 0.2);
     }
 
+    .cloud-stage.small .face {
+      width: 58px;
+      height: 38px;
+    }
+
+    .cloud-stage.small .eye {
+      width: 22px;
+      height: 26px;
+      background:
+        radial-gradient(circle at 55% 34%, #ffffff 0 2px, transparent 3px),
+        radial-gradient(circle at 46% 48%, #1d1d1d 0 7px, #303030 8px 10px, transparent 11px),
+        radial-gradient(circle at 50% 50%, #ffffff 0 13px, #b6b8be 14px 16px, transparent 17px);
+    }
+
+    .cloud-stage.small .eye.left {
+      left: 4px;
+    }
+
+    .cloud-stage.small .eye.right {
+      right: 4px;
+    }
+
+    .cloud-stage.small .mouth {
+      width: 38px;
+      height: 22px;
+      border-width: 2px;
+    }
+
+    .info-screen,
+    .products-screen {
+      position: relative;
+      min-height: 100vh;
+      align-items: center;
+      justify-items: center;
+      padding: clamp(36px, 7vw, 92px);
+      text-align: center;
+    }
+
+    .info-content,
+    .products-content {
+      position: relative;
+      z-index: 2;
+      width: min(1120px, 100%);
+      display: grid;
+      justify-items: center;
+    }
+
+    .info-copy {
+      margin: 22px 0 0;
+      font-size: clamp(23px, 2.2vw, 34px);
+      line-height: 1.22;
+    }
+
+    .info-copy p {
+      margin: 0 0 34px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button.ready-link {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .actions .ready-link {
+      min-width: 178px;
+      min-height: 36px;
+      margin-top: 0;
+      padding: 6px 28px;
+      font-size: 20px;
+    }
+
+    .products-cloud {
+      position: absolute;
+      left: 2%;
+      top: 6%;
+      width: min(280px, 24vw);
+      min-width: 150px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .products-title {
+      margin: 0 0 28px;
+      font-size: clamp(72px, 8vw, 138px);
+      line-height: 0.92;
+      font-weight: 700;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(210px, 1fr));
+      gap: clamp(22px, 3vw, 38px);
+      width: min(1040px, 100%);
+    }
+
+    .product-card {
+      min-height: 350px;
+      padding: 48px 28px 34px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #050505;
+    }
+
+    .product-card.makeup {
+      background: #edcff4;
+    }
+
+    .product-card.filters {
+      background: #efffbd;
+    }
+
+    .product-card.pose {
+      background: #bfdcf5;
+    }
+
+    .product-icon {
+      height: 110px;
+      display: grid;
+      place-items: center;
+      font-size: 74px;
+      line-height: 1;
+    }
+
+    .product-label {
+      display: inline-block;
+      min-width: 220px;
+      margin-top: 18px;
+      padding: 5px 16px;
+      background: #ffe45a;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 28px;
+      font-style: italic;
+      line-height: 1;
+    }
+
+    .product-card p {
+      max-width: 280px;
+      margin: 24px 0 0;
+      font-size: 20px;
+      line-height: 1.2;
+      text-align: left;
+    }
+
+    .products-ready {
+      min-width: 178px;
+      min-height: 38px;
+      margin-top: 22px;
+      font-size: 20px;
+    }
+
     @media (max-width: 900px) {
-      .landing {
+      .landing,
+      .info-screen,
+      .products-screen {
         grid-template-columns: 1fr;
         align-content: center;
         padding: 42px 24px 56px;
@@ -288,6 +472,33 @@
         width: min(520px, 88vw);
         min-width: 0;
       }
+
+      .info-screen,
+      .products-screen {
+        display: none;
+      }
+
+      .info-screen.active,
+      .products-screen.active {
+        display: grid;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+        width: min(390px, 100%);
+      }
+
+      .products-cloud {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: min(220px, 60vw);
+        margin-bottom: -18px;
+      }
+
+      .products-title {
+        font-size: clamp(58px, 16vw, 92px);
+      }
     }
 
     @media (max-width: 520px) {
@@ -304,16 +515,37 @@
         width: min(260px, 82vw);
         font-size: 22px;
       }
+
+      .actions .ready-link,
+      .products-ready {
+        width: min(190px, 70vw);
+        font-size: 18px;
+      }
+
+      .info-copy {
+        font-size: 22px;
+      }
+
+      .product-card {
+        min-height: 0;
+        padding: 34px 24px 30px;
+      }
+
+      .product-label {
+        min-width: 0;
+        width: 100%;
+        font-size: 25px;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="landing" aria-label="Pretty face filter welcome page">
+  <main class="landing screen active" data-screen="welcome" aria-label="Pretty face filter welcome page">
     <section class="intro">
       <h1>hi there,</h1>
       <div class="pretty-mark">pretty!</div>
       <p class="tagline">are you ready to slay, serve &amp;<br><strong>yassify</strong> yourself? ☺</p>
-      <a class="ready-link" href="frapp.html">i'm ready</a>
+      <button class="ready-link" type="button" data-next="notice">i'm ready</button>
     </section>
 
     <section class="cloud-stage" aria-hidden="true">
@@ -336,5 +568,106 @@
       </div>
     </section>
   </main>
+
+  <main class="info-screen screen" data-screen="notice" aria-label="Face data notice">
+    <section class="info-content">
+      <div class="cloud-stage small" aria-hidden="true">
+        <div class="contour"></div>
+        <div class="contour"></div>
+        <div class="contour"></div>
+        <div class="contour"></div>
+        <div class="contour"></div>
+        <div class="cloud">
+          <span class="puff-main"></span>
+          <span class="puff-left"></span>
+          <span class="puff-right"></span>
+          <span class="puff-top"></span>
+          <span class="puff-base"></span>
+          <div class="face">
+            <span class="eye left"></span>
+            <span class="eye right"></span>
+            <span class="mouth"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-copy">
+        <p>it's important to know that this experience uses your face in real time<br>to create a personalised interaction.</p>
+        <p>no personal data will be stored after you leave.</p>
+      </div>
+
+      <div class="actions">
+        <button class="ready-link" type="button" data-next="products">i understand</button>
+        <button class="ready-link dark" type="button" data-next="welcome">nevermind</button>
+      </div>
+    </section>
+  </main>
+
+  <main class="products-screen screen" data-screen="products" aria-label="Products and FAQs">
+    <section class="products-content">
+      <div class="products-cloud" aria-hidden="true">
+        <div class="cloud-stage small">
+          <div class="contour"></div>
+          <div class="contour"></div>
+          <div class="contour"></div>
+          <div class="contour"></div>
+          <div class="contour"></div>
+          <div class="cloud">
+            <span class="puff-main"></span>
+            <span class="puff-left"></span>
+            <span class="puff-right"></span>
+            <span class="puff-top"></span>
+            <span class="puff-base"></span>
+            <div class="face">
+              <span class="eye left"></span>
+              <span class="eye right"></span>
+              <span class="mouth"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="products-title">let's start!</h2>
+
+      <section class="product-grid" aria-label="Available experiences">
+        <article class="product-card makeup">
+          <div class="product-icon" aria-hidden="true">💄</div>
+          <span class="product-label">[make-up looks]</span>
+          <p>no time to put on make-up today, or just curious how you look like with different looks? experiment with our different make-up filters.</p>
+        </article>
+
+        <article class="product-card filters">
+          <div class="product-icon" aria-hidden="true">💬</div>
+          <span class="product-label">[special filters]</span>
+          <p>want to represent something specific, like your fandoms, hobbies, or nationality? we can tailor our filters to your specific needs.</p>
+        </article>
+
+        <article class="product-card pose">
+          <div class="product-icon" aria-hidden="true">🤙</div>
+          <span class="product-label">[pose-tool]</span>
+          <p>tired of not knowing how to pose, or doing the same pose over and over again? practice different poses with the pose-tool.</p>
+        </article>
+      </section>
+
+      <a class="ready-link products-ready" href="frapp.html">i'm ready</a>
+    </section>
+  </main>
+
+  <script>
+    const screens = document.querySelectorAll(".screen");
+
+    function showScreen(name) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.dataset.screen === name);
+      });
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    document.querySelectorAll("[data-next]").forEach((button) => {
+      button.addEventListener("click", () => {
+        showScreen(button.dataset.next);
+      });
+    });
+  </script>
 </body>
 </html>
