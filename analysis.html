@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Face Analysis — Night of the Nerds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/analysis.css?v=53" />
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script type="module" defer src="./js/analysis/main.js?v=50"></script>
+  </head>
+  <body class="atmosphere--boot">
+    <main class="mirror mirror--hidden" id="mirror" aria-hidden="true">
+      <video id="webcam" autoplay muted playsinline></video>
+      <canvas id="overlay"></canvas>
+      <div class="fx-layer fx-layer--scanlines" aria-hidden="true"></div>
+      <div class="fx-layer fx-layer--grain" aria-hidden="true"></div>
+      <div class="fx-layer fx-layer--vignette" aria-hidden="true"></div>
+
+      <div id="statusCaptions" class="status-captions" aria-live="polite"></div>
+
+      <section class="dramatic-grid" aria-live="polite">
+        <p id="dramaticState" class="dramatic-text dramatic-text--slot-1 dramatic-text--searching">
+          AWAITING SUBJECT
+        </p>
+        <p id="dramaticAge" class="dramatic-text dramatic-text--slot-2 dramatic-text--tracking">
+          AGE ANALYSIS PENDING
+        </p>
+        <p id="dramaticGender" class="dramatic-text dramatic-text--slot-3 dramatic-text--tracking">
+          GENDER ANALYSIS PENDING
+        </p>
+        <p id="dramaticEmotion" class="dramatic-text dramatic-text--slot-4 dramatic-text--alert">
+          EMOTION ANALYSIS PENDING
+        </p>
+      </section>
+
+      <p id="notice" class="notice">Local-only processing. No images or data are stored.</p>
+
+      <div
+        id="captureCountdown"
+        class="capture-countdown capture-countdown--hidden"
+        aria-live="assertive"
+        aria-hidden="true"
+      >
+        <p class="capture-countdown__message">Look at the camera</p>
+        <p id="captureCountdownValue" class="capture-countdown__value">5</p>
+      </div>
+    </main>
+
+    <section id="posterStage" class="poster-stage poster-stage--hidden" aria-hidden="true">
+      <div class="poster-stage__depth" aria-hidden="true"></div>
+      <div class="poster-stage__flash" aria-hidden="true"></div>
+      <div class="poster-stage__layout">
+        <header class="poster-stage__header">
+          <p class="poster-stage__label">Misplaced identity</p>
+          <h2 id="posterTitle" class="poster-stage__title">Scenario</h2>
+          <p id="posterCounter" class="poster-stage__counter">1 / 5</p>
+        </header>
+        <figure class="poster-stage__frame">
+          <button id="posterPrev" type="button" class="poster-stage__nav poster-stage__nav--prev" aria-label="Previous scenario">
+            ‹
+          </button>
+          <canvas id="posterCanvas" class="poster-stage__canvas"></canvas>
+          <button id="posterNext" type="button" class="poster-stage__nav poster-stage__nav--next" aria-label="Next scenario">
+            ›
+          </button>
+        </figure>
+        <footer class="poster-stage__footer">
+          <p id="posterNotice" class="poster-stage__notice">Processed locally — nothing is saved</p>
+          <p id="posterHint" class="poster-stage__hint">Your face, in the wrong context</p>
+          <div class="poster-stage__actions poster-stage__actions--continue">
+            <button id="posterContinue" type="button" class="poster-stage__btn poster-stage__btn--continue">
+              Continue
+            </button>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </body>
+</html>
