@@ -6,6 +6,31 @@ function clampCrop(sx, sy, sw, sh, vw, vh) {
   return { sx: x, sy: y, sw: w, sh: h };
 }
 
+function clampCropPreserveAspect(sx, sy, sw, sh, vw, vh) {
+  const aspect = sw / sh;
+  let cropW = sw;
+  let cropH = sh;
+  let cropX = sx;
+  let cropY = sy;
+
+  if (cropW > vw) {
+    cropW = vw;
+    cropH = cropW / aspect;
+  }
+
+  if (cropH > vh) {
+    cropH = vh;
+    cropW = cropH * aspect;
+  }
+
+  cropX = sx + sw / 2 - cropW / 2;
+  cropY = sy + sh / 2 - cropH / 2;
+  cropX = Math.max(0, Math.min(cropX, vw - cropW));
+  cropY = Math.max(0, Math.min(cropY, vh - cropH));
+
+  return { sx: cropX, sy: cropY, sw: cropW, sh: cropH };
+}
+
 function drawMirroredRegion(video, sx, sy, sw, sh) {
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(8, Math.round(sw));
@@ -53,6 +78,21 @@ function computeFaceCenter(landmarks, crop, canvasW, canvasH) {
   };
 }
 
+function computeShapedFaceCenter(landmarks, crop, canvasW, canvasH) {
+  if (!landmarks?.length || landmarks.length < 46 || !crop) {
+    return { x: canvasW / 2, y: canvasH / 2 };
+  }
+
+  const leftEye = toMirroredCanvasPoint(landmarks[36], crop);
+  const rightEye = toMirroredCanvasPoint(landmarks[45], crop);
+  const nose = toMirroredCanvasPoint(landmarks[30], crop);
+
+  return {
+    x: (leftEye.x + rightEye.x) / 2,
+    y: (leftEye.y + rightEye.y) * 0.72 + nose.y * 0.28
+  };
+}
+
 function computeFaceRoll(landmarks, crop) {
   if (!landmarks?.length || landmarks.length < 46 || !crop) {
     return 0;
@@ -77,8 +117,9 @@ function getFaceFocalPoint(faceData, bw, bh) {
     const leftEye = faceData.landmarks[36];
     const rightEye = faceData.landmarks[45];
     const nose = faceData.landmarks[30];
+    const chin = faceData.landmarks[8];
     cx = (leftEye.x + rightEye.x) / 2;
-    cy = (leftEye.y + rightEye.y) * 0.52 + nose.y * 0.48;
+    cy = (leftEye.y + rightEye.y) * 0.35 + nose.y * 0.35 + chin.y * 0.3;
   }
 
   return { cx, cy };
@@ -109,7 +150,7 @@ function cropShapedFromFaceBox(video, faceData, options = {}) {
     cropW = base / aspect;
   }
 
-  return clampCrop(cx - cropW / 2, cy - cropH / 2, cropW, cropH, vw, vh);
+  return clampCropPreserveAspect(cx - cropW / 2, cy - cropH / 2, cropW, cropH, vw, vh);
 }
 
 function getShapedCropOptions(template) {
@@ -125,7 +166,7 @@ function getShapedCropOptions(template) {
 }
 
 function buildShapedCapture(video, faceData, shapedCrop) {
-  const squareCanvas = drawMirroredRegion(
+  const shapedCanvas = drawMirroredRegion(
     video,
     shapedCrop.sx,
     shapedCrop.sy,
@@ -134,15 +175,19 @@ function buildShapedCapture(video, faceData, shapedCrop) {
   );
 
   return {
-    squareCanvas,
-    faceCenterSquare: computeFaceCenter(
+    shapedCanvas,
+    faceCenterShaped: computeShapedFaceCenter(
       faceData.landmarks,
       shapedCrop,
-      squareCanvas.width,
-      squareCanvas.height
+      shapedCanvas.width,
+      shapedCanvas.height
     ),
-    rollSquare: computeFaceRoll(faceData.landmarks, shapedCrop)
+    rollShaped: computeFaceRoll(faceData.landmarks, shapedCrop)
   };
+}
+
+function usesShapedCapture(template) {
+  return template?.faceCrop === "square" || template?.faceCrop === "shaped";
 }
 
 export function captureFaceFromVideo(video, faceData, template = null) {
@@ -188,7 +233,8 @@ export function captureFaceFromVideo(video, faceData, template = null) {
   return {
     canvas,
     faceCanvas,
-    squareCanvas: shaped.squareCanvas,
+    squareCanvas: shaped.shapedCanvas,
+    shapedCanvas: shaped.shapedCanvas,
     faceCenter: computeFaceCenter(
       faceData.landmarks,
       faceCrop,
@@ -201,16 +247,18 @@ export function captureFaceFromVideo(video, faceData, template = null) {
       canvas.width,
       canvas.height
     ),
-    faceCenterSquare: shaped.faceCenterSquare,
+    faceCenterSquare: shaped.faceCenterShaped,
+    faceCenterShaped: shaped.faceCenterShaped,
     roll: computeFaceRoll(faceData.landmarks, faceCrop),
     rollPadded: computeFaceRoll(faceData.landmarks, paddedCrop),
-    rollSquare: shaped.rollSquare
+    rollSquare: shaped.rollShaped,
+    rollShaped: shaped.rollShaped
   };
 }
 
 export function getFaceCenter(capture, template) {
-  if (template?.faceCrop === "square") {
-    return capture?.faceCenterSquare;
+  if (usesShapedCapture(template)) {
+    return capture?.faceCenterShaped ?? capture?.faceCenterSquare;
   }
 
   if (template?.faceCrop === "detectedFaceOnly") {
@@ -221,8 +269,8 @@ export function getFaceCenter(capture, template) {
 }
 
 export function getFaceRoll(capture, template) {
-  if (template?.faceCrop === "square") {
-    return capture?.rollSquare ?? 0;
+  if (usesShapedCapture(template)) {
+    return capture?.rollShaped ?? capture?.rollSquare ?? 0;
   }
 
   if (template?.faceCrop === "detectedFaceOnly") {
@@ -233,12 +281,12 @@ export function getFaceRoll(capture, template) {
 }
 
 export function getCaptureSource(capture, template) {
-  if (template?.faceCrop === "square" && capture?.squareCanvas) {
-    return capture.squareCanvas;
+  if (usesShapedCapture(template)) {
+    return capture?.shapedCanvas ?? capture?.squareCanvas ?? null;
   }
 
   if (template?.faceCrop === "detectedFaceOnly" && capture?.faceCanvas) {
-    return capture.faceCanvas;
+    return capture?.faceCanvas;
   }
 
   return capture?.canvas || null;

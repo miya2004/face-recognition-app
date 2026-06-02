@@ -16,10 +16,9 @@ export const CONFIG = {
     pointRadius: 1.3
   },
   poster: {
-    analysisDurationMs: 30_000,
+    analysisDurationMs: 10_000,
     captureCountdownSeconds: 5,
-    flashFirstHoldMs: 4000,
-    flashHoldMs: 800,
+    flashScenarioMs: 3000,
     flashBurstMs: 680,
     templateIds: null
   },

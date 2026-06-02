@@ -12,15 +12,16 @@ export const POSTER_TEMPLATES = [
       width: 0.42,
       height: 0.42
     },
-    faceCrop: "square",
-    cropScale: 1.96,
-    cropCenterBiasY: 0.14,
-    faceBleed: 1,
-    faceScale: 1.06,
-    faceVerticalFocus: 0.56,
+    faceCrop: "shaped",
+    cropScale: 2.18,
+    cropCenterBiasY: -0.1,
+    faceBleed: 1.12,
+    faceScale: 1.24,
+    maskBoundsScale: 1.08,
+    levelFaceRoll: false,
     maskFeather: 0,
-    faceCenterAdjust: { x: 0, y: 0.015 },
-    faceAnchorAdjust: { x: 0, y: 0.03 },
+    faceCenterAdjust: { x: 0, y: 0.018 },
+    faceAnchorAdjust: { x: 0, y: -0.04 },
     faceFilter: {
       brightness: 1.05,
       contrast: 0.95,
@@ -56,6 +57,35 @@ export const POSTER_TEMPLATES = [
     faceOverlay: "rgba(245, 225, 210, 0.08)"
   },
   {
+    id: "id-badge",
+    title: "ID badge",
+    width: 941,
+    height: 1672,
+    imageUrl: "./assets/templates/id.png",
+    maskUrl: "./assets/templates/id-mask.png",
+    faceSlot: {
+      x: 0.5,
+      y: 0.38,
+      width: 0.36,
+      height: 0.28
+    },
+    faceCrop: "shaped",
+    cropScale: 1.92,
+    cropCenterBiasY: 0.1,
+    faceBleed: 1.04,
+    faceScale: 1.1,
+    levelFaceRoll: false,
+    maskFeather: 0,
+    faceCenterAdjust: { x: 0, y: 0 },
+    faceFilter: {
+      brightness: 1.02,
+      contrast: 0.98,
+      saturate: 0.95,
+      blur: 0.15
+    },
+    faceOverlay: "rgba(240, 245, 250, 0.04)"
+  },
+  {
     id: "security-cam",
     title: "Security camera feed",
     width: 1448,
@@ -80,6 +110,66 @@ export const POSTER_TEMPLATES = [
       blur: 0.8
     },
     faceOverlay: "rgba(120, 160, 170, 0.08)"
+  },
+  {
+    id: "news",
+    title: "News article",
+    width: 1122,
+    height: 1402,
+    imageUrl: "./assets/templates/news.png",
+    maskUrl: "./assets/templates/news-mask.png",
+    faceSlot: {
+      x: 0.313,
+      y: 0.495,
+      width: 0.382,
+      height: 0.27
+    },
+    faceCrop: "shaped",
+    cropScale: 1.92,
+    cropCenterBiasY: 0.1,
+    faceBleed: 1.04,
+    faceScale: 1.1,
+    levelFaceRoll: false,
+    maskFeather: 0,
+    faceCenterAdjust: { x: 0, y: 0 },
+    faceFilter: {
+      brightness: 0.98,
+      contrast: 1.02,
+      saturate: 0.88,
+      blur: 0.2
+    },
+    faceOverlay: "rgba(220, 215, 205, 0.05)"
+  },
+  {
+    id: "review",
+    title: "Customer review",
+    width: 1122,
+    height: 1402,
+    imageUrl: "./assets/templates/review.png",
+    maskUrl: "./assets/templates/review-mask.png",
+    faceSlot: {
+      x: 0.155,
+      y: 0.316,
+      width: 0.193,
+      height: 0.178
+    },
+    faceCrop: "shaped",
+    cropScale: 2.08,
+    cropCenterBiasY: -0.08,
+    faceBleed: 1.1,
+    faceScale: 1.2,
+    maskBoundsScale: 1.06,
+    levelFaceRoll: false,
+    maskFeather: 0,
+    faceCenterAdjust: { x: 0, y: 0.012 },
+    faceAnchorAdjust: { x: 0, y: -0.035 },
+    faceFilter: {
+      brightness: 1.04,
+      contrast: 0.96,
+      saturate: 1.02,
+      blur: 0.15
+    },
+    faceOverlay: "rgba(255, 250, 242, 0.05)"
   }
 ];
 

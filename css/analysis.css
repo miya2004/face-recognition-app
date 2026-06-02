@@ -729,6 +729,186 @@ body.outro-active {
   opacity: 0;
 }
 
+body.data-disposal-active {
+  overflow: hidden;
+}
+
+.data-disposal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: radial-gradient(circle at 50% 18%, rgba(38, 8, 8, 0.96), rgba(4, 4, 6, 0.99));
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.data-disposal--visible {
+  opacity: 1;
+}
+
+.data-disposal__depth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 72, 72, 0.08), transparent 34%),
+    radial-gradient(circle at 80% 78%, rgba(255, 120, 60, 0.06), transparent 30%);
+}
+
+.data-disposal__content {
+  position: relative;
+  z-index: 1;
+  width: min(34rem, 92vw);
+  text-align: center;
+}
+
+.data-disposal__status {
+  margin: 0 0 1.5rem;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffd0d0;
+}
+
+.data-disposal__bin {
+  position: relative;
+  width: 4.5rem;
+  height: 3.4rem;
+  margin: 0 auto 1.35rem;
+}
+
+.data-disposal__bin-body {
+  position: absolute;
+  left: 0.55rem;
+  right: 0.55rem;
+  bottom: 0;
+  height: 2.35rem;
+  border: 2px solid rgba(255, 120, 80, 0.55);
+  border-radius: 0.15rem 0.15rem 0.35rem 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.data-disposal__bin-lid {
+  position: absolute;
+  left: 0.2rem;
+  right: 0.2rem;
+  top: 0.35rem;
+  height: 0.55rem;
+  border: 2px solid rgba(255, 120, 80, 0.55);
+  border-radius: 0.15rem;
+  transform-origin: left center;
+  animation: disposal-lid 2.4s ease-in-out infinite;
+}
+
+.data-disposal--cleared .data-disposal__bin-lid {
+  animation: disposal-lid-open 0.55s ease forwards;
+}
+
+.data-disposal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.data-disposal__chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(255, 90, 90, 0.28);
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffe3e3;
+  font-size: clamp(0.72rem, 2vw, 0.84rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s cubic-bezier(0.4, 0, 0.8, 0.2),
+    filter 0.35s ease;
+}
+
+.data-disposal__chip-delete {
+  color: rgba(255, 120, 80, 0.85);
+  font-size: 0.9rem;
+}
+
+.data-disposal__chip--discarding {
+  opacity: 0;
+  transform: translate(1.4rem, 2.6rem) scale(0.55) rotate(18deg);
+  filter: blur(3px);
+}
+
+.data-disposal__final,
+.data-disposal__restart {
+  margin: 1.35rem 0 0;
+  line-height: 1.45;
+  animation: disposal-fade-up 0.7s ease both;
+}
+
+.data-disposal__final {
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  letter-spacing: 0.08em;
+  color: #fff4f4;
+}
+
+.data-disposal__restart {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: rgba(255, 210, 210, 0.72);
+}
+
+.data-disposal__wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, #c8d9f1 0%, #eff6ff 100%);
+  transform: translateY(100%);
+  transition: transform 0.95s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-disposal__wipe--active {
+  transform: translateY(0);
+}
+
+@keyframes disposal-lid {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes disposal-lid-open {
+  to {
+    transform: rotate(-28deg) translateY(-0.15rem);
+  }
+}
+
+@keyframes disposal-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 900px) {
   .intro__content {
     gap: clamp(2.25rem, 8vh, 4rem);
@@ -740,6 +920,10 @@ body.outro-active {
 
   .intro__footer {
     gap: 1.35rem;
+  }
+
+  .data-disposal__list {
+    grid-template-columns: 1fr;
   }
 
   .status-caption {
@@ -919,6 +1103,80 @@ body.outro-active {
   }
   60% {
     transform: translate3d(2px, -1px, 0);
+  }
+}
+
+.poster-stage--overview .poster-stage__layout {
+  width: min(96rem, 100%);
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.poster-stage--overview .poster-stage__frame--single {
+  display: none;
+}
+
+.poster-stage__grid {
+  display: none;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.65rem, 1.4vw, 1.15rem);
+}
+
+.poster-stage--overview .poster-stage__grid {
+  display: grid;
+}
+
+.poster-stage__grid--revealed .poster-stage__grid-item {
+  animation: poster-grid-reveal 0.65s cubic-bezier(0.12, 1, 0.28, 1) both;
+  animation-delay: calc(var(--grid-index) * 0.07s);
+}
+
+.poster-stage__grid-item {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.poster-stage__grid-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.poster-stage__grid-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(32vh, 380px);
+  object-fit: contain;
+  background: #1a1a1a;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 72, 72, 0.1);
+}
+
+.poster-stage__grid-label {
+  margin: 0;
+  font-size: clamp(0.68rem, 1.1vw, 0.78rem);
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--muted);
+}
+
+@keyframes poster-grid-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1121,6 +1379,14 @@ body.outro-active {
 }
 
 @media (max-width: 900px) {
+  .poster-stage__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .poster-stage__grid-image {
+    max-height: min(24vh, 260px);
+  }
+
   .poster-stage__frame {
     width: min(100%, 100vw - 1.5rem);
     gap: 0.35rem;

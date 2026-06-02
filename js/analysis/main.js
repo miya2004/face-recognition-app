@@ -13,6 +13,7 @@ import {
 import { startPulseScheduler, stopPulseScheduler } from "./pulse.js";
 import { showOutro } from "./outro.js";
 import { OUTRO_SLIDES } from "./outroSlides.js";
+import { showDataDisposal } from "./dataDisposal.js";
 import { createPosterPhase } from "./poster/posterPhase.js";
 import { POSTER_TEMPLATES } from "./poster/templates.js";
 
@@ -58,6 +59,7 @@ const posterTemplates = CONFIG.poster.templateIds
 const posterPhase = createPosterPhase({
   stageEl: document.getElementById("posterStage"),
   canvasEl: document.getElementById("posterCanvas"),
+  gridEl: document.getElementById("posterGrid"),
   titleEl: document.getElementById("posterTitle"),
   counterEl: document.getElementById("posterCounter"),
   hintEl: document.getElementById("posterHint"),
@@ -295,8 +297,14 @@ async function beginOutroPhase() {
   mirror?.classList.add("mirror--poster-hidden");
 
   await showOutro(OUTRO_SLIDES);
+  await showDataDisposal({ video });
 
-  window.location.href = "index.html";
+  // Brief pause so media tracks and in-flight requests can close cleanly
+  // before navigating away (avoids hung single-threaded dev server issues).
+  await new Promise((resolve) => window.setTimeout(resolve, 350));
+
+  const landingUrl = new URL("./index.html", window.location.href).href;
+  window.location.replace(landingUrl);
 }
 
 async function analysisTick(timestamp) {

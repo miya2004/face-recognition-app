@@ -84,6 +84,75 @@ function drawSocialMediaBackground(ctx, width, height) {
   ctx.fillText("@your_profile", width * 0.5, avatarY + avatarSize + width * 0.08);
 }
 
+function drawIdBadgeBackground(ctx, width, height) {
+  ctx.fillStyle = "#e8ecf0";
+  ctx.fillRect(0, 0, width, height);
+
+  const cardW = width * 0.72;
+  const cardH = height * 0.78;
+  const cardX = (width - cardW) / 2;
+  const cardY = height * 0.12;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(cardX, cardY, cardW, cardH);
+
+  const photoSize = cardW * 0.5;
+  const photoX = cardX + (cardW - photoSize) / 2;
+  const photoY = cardY + cardH * 0.12;
+  ctx.fillStyle = "#d8dde4";
+  ctx.fillRect(photoX, photoY, photoSize, photoSize * 0.82);
+
+  ctx.fillStyle = "#1a3a5c";
+  ctx.font = `700 ${Math.round(width * 0.038)}px Arial`;
+  ctx.textAlign = "center";
+  ctx.fillText("VISITOR", width * 0.5, cardY + cardH * 0.72);
+}
+
+function drawNewsBackground(ctx, width, height) {
+  ctx.fillStyle = "#f4f4f4";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(width * 0.08, height * 0.1, width * 0.58, height * 0.78);
+
+  ctx.fillStyle = "#c0392b";
+  ctx.fillRect(width * 0.08, height * 0.1, width * 0.58, height * 0.025);
+
+  const photoW = width * 0.38;
+  const photoH = height * 0.27;
+  const photoX = width * 0.12;
+  const photoY = height * 0.36;
+  ctx.fillStyle = "#d8d8d8";
+  ctx.fillRect(photoX, photoY, photoW, photoH);
+
+  ctx.fillStyle = "#1a1a1a";
+  ctx.font = `700 ${Math.round(width * 0.038)}px Georgia, serif`;
+  ctx.textAlign = "left";
+  ctx.fillText("Breaking Story", width * 0.12, height * 0.22);
+}
+
+function drawReviewBackground(ctx, width, height) {
+  ctx.fillStyle = "#f0f0f0";
+  ctx.fillRect(0, 0, width, height);
+
+  const cardW = width * 0.88;
+  const cardH = height * 0.72;
+  const cardX = (width - cardW) / 2;
+  const cardY = height * 0.14;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(cardX, cardY, cardW, cardH);
+
+  const avatarSize = width * 0.19;
+  const avatarX = cardX + width * 0.04;
+  const avatarY = cardY + height * 0.08;
+  ctx.fillStyle = "#e4e4e4";
+  ctx.fillRect(avatarX, avatarY, avatarSize, avatarSize * 1.16);
+
+  ctx.fillStyle = "#1a1a1a";
+  ctx.font = `700 ${Math.round(width * 0.034)}px Arial`;
+  ctx.textAlign = "left";
+  ctx.fillText("Customer Review", cardX + width * 0.28, cardY + height * 0.12);
+}
+
 function createBackgroundCanvas(template) {
   const canvas = document.createElement("canvas");
   canvas.width = template.width;
@@ -98,6 +167,12 @@ function createBackgroundCanvas(template) {
     drawSocialMediaBackground(ctx, template.width, template.height);
   } else if (template.id === "security-cam") {
     drawSecurityBackground(ctx, template.width, template.height);
+  } else if (template.id === "id-badge") {
+    drawIdBadgeBackground(ctx, template.width, template.height);
+  } else if (template.id === "news") {
+    drawNewsBackground(ctx, template.width, template.height);
+  } else if (template.id === "review") {
+    drawReviewBackground(ctx, template.width, template.height);
   } else {
     drawBillboardBackground(ctx, template.width, template.height);
   }
@@ -111,7 +186,7 @@ export function applyFallbackAssets(template) {
     template.width,
     template.height,
     template.faceSlot,
-    template.faceCrop === "square"
+    template.faceCrop === "square" || template.faceCrop === "shaped"
   );
   template.width = template.width || template.image.width;
   template.height = template.height || template.image.height;

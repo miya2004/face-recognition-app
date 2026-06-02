@@ -41,11 +41,12 @@ function resolveMaskTarget(template, posterW, posterH) {
 
   if (template.maskBounds) {
     const { cx, cy, width, height } = template.maskBounds;
+    const boundsScale = template.maskBoundsScale ?? 1;
     target = {
       cx: cx * posterW + adjust.x * posterW,
       cy: cy * posterH + adjust.y * posterH,
-      width: width * posterW * bleed,
-      height: height * posterH * bleed
+      width: width * posterW * bleed * boundsScale,
+      height: height * posterH * bleed * boundsScale
     };
   } else {
     const slot = template.faceSlot;
@@ -57,7 +58,10 @@ function resolveMaskTarget(template, posterW, posterH) {
     };
   }
 
-  if (template.faceCrop === "square" && !template.maskBounds) {
+  if (
+    (template.faceCrop === "square" || template.faceCrop === "shaped") &&
+    !template.maskBounds
+  ) {
     const squareSize = Math.max(target.width, target.height);
     target.width = squareSize;
     target.height = squareSize;
@@ -197,7 +201,7 @@ export function renderAllPosters(video, faceData, templates) {
     .filter((template) => template.image)
     .map((template) => {
       const capture =
-        template.faceCrop === "square"
+        template.faceCrop === "square" || template.faceCrop === "shaped"
           ? captureFaceFromVideo(video, faceData, template) || baseCapture
           : baseCapture;
 

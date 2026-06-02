@@ -11,6 +11,7 @@ export function createPosterPhase(options) {
   const {
     stageEl,
     canvasEl,
+    gridEl,
     titleEl,
     counterEl,
     hintEl,
@@ -22,8 +23,10 @@ export function createPosterPhase(options) {
   } = options;
 
   const flashEl = stageEl?.querySelector(".poster-stage__flash");
-  const firstHoldMs = Number(CONFIG.poster?.flashFirstHoldMs) || 4000;
-  const holdMs = Number(CONFIG.poster?.flashHoldMs) || 800;
+  const scenarioHoldMs =
+    Number(CONFIG.poster?.flashScenarioMs) ||
+    Number(CONFIG.poster?.flashHoldMs) ||
+    3000;
   const burstMs = Number(CONFIG.poster?.flashBurstMs) || 680;
 
   let posters = [];
@@ -60,21 +63,20 @@ export function createPosterPhase(options) {
       return;
     }
 
-    const browsingAfterSequence = stageEl?.classList.contains("poster-stage--await-continue");
-    const canNavigate = visible && !stageEl?.classList.contains("poster-stage--sequencing");
+    const inOverview = stageEl?.classList.contains("poster-stage--overview");
 
     if (prevBtn) {
-      prevBtn.disabled = !canNavigate;
+      prevBtn.disabled = true;
+      prevBtn.hidden = inOverview;
     }
 
     if (nextBtn) {
-      nextBtn.disabled = !canNavigate;
+      nextBtn.disabled = true;
+      nextBtn.hidden = inOverview;
     }
 
-    if (hintEl) {
-      hintEl.textContent = browsingAfterSequence
-        ? "Use the arrows to browse scenarios, then continue"
-        : "Use the arrows to move between scenarios";
+    if (hintEl && inOverview) {
+      hintEl.textContent = "Your face, misplaced across every context";
     }
   }
 
@@ -111,12 +113,62 @@ export function createPosterPhase(options) {
 
   function setSequenceMode(active) {
     stageEl?.classList.toggle("poster-stage--sequencing", active);
+  }
+
+  function setOverviewMode(active) {
+    stageEl?.classList.toggle("poster-stage--overview", active);
+    stageEl?.classList.toggle("poster-stage--await-continue", active);
+    gridEl?.setAttribute("aria-hidden", active ? "false" : "true");
     updateNavControls();
   }
 
-  function setAwaitContinueMode(active) {
-    stageEl?.classList.toggle("poster-stage--await-continue", active);
-    updateNavControls();
+  function buildPosterGrid() {
+    if (!gridEl) {
+      return;
+    }
+
+    gridEl.innerHTML = "";
+
+    posters.forEach(({ template, canvas }, itemIndex) => {
+      const item = document.createElement("figure");
+      item.className = "poster-stage__grid-item";
+      item.style.setProperty("--grid-index", String(itemIndex));
+
+      const media = document.createElement("div");
+      media.className = "poster-stage__grid-media";
+
+      const image = document.createElement("img");
+      image.className = "poster-stage__grid-image";
+      image.src = canvas.toDataURL("image/png");
+      image.width = canvas.width;
+      image.height = canvas.height;
+      image.alt = template.title;
+
+      const caption = document.createElement("figcaption");
+      caption.className = "poster-stage__grid-label";
+      caption.textContent = template.title;
+
+      media.appendChild(image);
+      item.append(media, caption);
+      gridEl.appendChild(item);
+    });
+  }
+
+  function showOverview() {
+    buildPosterGrid();
+
+    if (titleEl) {
+      titleEl.textContent = "Everywhere at once";
+    }
+
+    if (counterEl) {
+      counterEl.textContent = `${posters.length} scenarios`;
+    }
+
+    setOverviewMode(true);
+    gridEl?.classList.remove("poster-stage__grid--revealed");
+    void gridEl?.offsetWidth;
+    gridEl?.classList.add("poster-stage__grid--revealed");
   }
 
   async function playFlashSequence() {
@@ -138,50 +190,29 @@ export function createPosterPhase(options) {
         break;
       }
 
-      if (i < posters.length - 1) {
-        const pauseMs = i === 0 ? firstHoldMs : holdMs;
-        await wait(pauseMs);
-      }
+      await wait(scenarioHoldMs);
     }
 
     stageEl?.classList.remove("poster-stage--impact");
     setSequenceMode(false);
-    index = posters.length - 1;
-    paintCurrentPoster();
-    setAwaitContinueMode(true);
-    updateNavControls();
+    showOverview();
   }
 
   function showStage() {
     stageEl.classList.remove("poster-stage--hidden");
     stageEl.removeAttribute("aria-hidden");
     visible = true;
-    updateNavControls();
   }
 
   function hideStage() {
     stageEl.classList.add("poster-stage--hidden");
     stageEl.setAttribute("aria-hidden", "true");
     stageEl.classList.remove("poster-stage--sequencing");
+    stageEl.classList.remove("poster-stage--overview");
+    stageEl.classList.remove("poster-stage--await-continue");
+    gridEl?.classList.remove("poster-stage__grid--revealed");
+    gridEl?.setAttribute("aria-hidden", "true");
     visible = false;
-  }
-
-  function next() {
-    if (!posters.length || nextBtn?.disabled) {
-      return;
-    }
-    index = (index + 1) % posters.length;
-    paintCurrentPoster();
-    flashPosterTransition();
-  }
-
-  function prev() {
-    if (!posters.length || prevBtn?.disabled) {
-      return;
-    }
-    index = (index - 1 + posters.length) % posters.length;
-    paintCurrentPoster();
-    flashPosterTransition();
   }
 
   function continueToOutro() {
@@ -189,29 +220,15 @@ export function createPosterPhase(options) {
       return;
     }
     sequenceAbort = true;
-    setAwaitContinueMode(false);
+    setOverviewMode(false);
     hideStage();
     onContinue?.();
   }
 
-  nextBtn?.addEventListener("click", next);
-  prevBtn?.addEventListener("click", prev);
   continueBtn?.addEventListener("click", continueToOutro);
 
   document.addEventListener("keydown", (event) => {
     if (!visible || stageEl?.classList.contains("poster-stage--sequencing")) {
-      return;
-    }
-
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      next();
-      return;
-    }
-
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      prev();
       return;
     }
 

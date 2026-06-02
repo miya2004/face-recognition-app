@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./css/analysis.css?v=53" />
+    <link rel="stylesheet" href="./css/analysis.css?v=54" />
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script type="module" defer src="./js/analysis/main.js?v=50"></script>
   </head>
@@ -59,9 +59,9 @@
         <header class="poster-stage__header">
           <p class="poster-stage__label">Misplaced identity</p>
           <h2 id="posterTitle" class="poster-stage__title">Scenario</h2>
-          <p id="posterCounter" class="poster-stage__counter">1 / 5</p>
+          <p id="posterCounter" class="poster-stage__counter">1 / 6</p>
         </header>
-        <figure class="poster-stage__frame">
+        <figure class="poster-stage__frame poster-stage__frame--single">
           <button id="posterPrev" type="button" class="poster-stage__nav poster-stage__nav--prev" aria-label="Previous scenario">
             ‹
           </button>
@@ -70,6 +70,7 @@
             ›
           </button>
         </figure>
+        <div id="posterGrid" class="poster-stage__grid" aria-hidden="true"></div>
         <footer class="poster-stage__footer">
           <p id="posterNotice" class="poster-stage__notice">Processed locally — nothing is saved</p>
           <p id="posterHint" class="poster-stage__hint">Your face, in the wrong context</p>
