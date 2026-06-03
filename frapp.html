@@ -102,6 +102,10 @@
       font-weight: bold;
     }
 
+    .slider-row.hidden {
+      display: none;
+    }
+
     .slider-row input {
       flex: 1;
       accent-color: hotpink;
@@ -294,88 +298,10 @@
       left: -20px;
       top: -64px;
       width: 180px;
-      height: 112px;
+      height: auto;
       filter: drop-shadow(0 12px 10px rgba(84, 91, 113, 0.25));
     }
 
-    .cloud-part {
-      position: absolute;
-      background: #dde5f5;
-      border-radius: 50%;
-    }
-
-    .cloud-part.one {
-      width: 92px;
-      height: 92px;
-      left: 45px;
-      top: 10px;
-    }
-
-    .cloud-part.two {
-      width: 86px;
-      height: 72px;
-      left: 0;
-      top: 40px;
-    }
-
-    .cloud-part.three {
-      width: 78px;
-      height: 72px;
-      right: 0;
-      top: 42px;
-    }
-
-    .cloud-part.four {
-      width: 116px;
-      height: 52px;
-      left: 34px;
-      bottom: 0;
-      border-radius: 34px;
-    }
-
-    .cloud-face {
-      position: absolute;
-      left: 69px;
-      top: 38px;
-      font-size: 28px;
-      line-height: 1;
-    }
-
-    .cloud-swirl {
-      position: absolute;
-      left: -20px;
-      top: -28px;
-      width: 115px;
-      height: 80px;
-      border: 2px solid white;
-      border-right-color: transparent;
-      border-radius: 50%;
-      transform: rotate(-16deg);
-      opacity: 0.95;
-    }
-
-    .cloud-swirl::before,
-    .cloud-swirl::after {
-      content: "";
-      position: absolute;
-      border: 2px solid white;
-      border-right-color: transparent;
-      border-radius: 50%;
-    }
-
-    .cloud-swirl::before {
-      width: 92px;
-      height: 60px;
-      left: 12px;
-      top: 9px;
-    }
-
-    .cloud-swirl::after {
-      width: 68px;
-      height: 42px;
-      left: 25px;
-      top: 19px;
-    }
   </style>
 </head>
 
@@ -403,15 +329,15 @@
       </div>
 
       <p id="message">Opening camera...</p>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="plumpLip">
         <span>Lips</span>
         <input id="lipSize" type="range" min="0" max="100" value="0" />
       </label>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="bigEyes">
         <span>Eyes</span>
         <input id="eyeSize" type="range" min="0" max="100" value="0" />
       </label>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="softGlam">
         <span>Face</span>
         <input id="faceSize" type="range" min="0" max="100" value="35" />
       </label>
@@ -423,14 +349,7 @@
 
   <div class="permission-overlay" id="permissionOverlay" aria-hidden="true">
     <div class="permission-popup" role="dialog" aria-modal="true" aria-labelledby="permissionTitle">
-      <div class="permission-cloud" aria-hidden="true">
-        <div class="cloud-swirl"></div>
-        <span class="cloud-part one"></span>
-        <span class="cloud-part two"></span>
-        <span class="cloud-part three"></span>
-        <span class="cloud-part four"></span>
-        <span class="cloud-face">👀<br>👄</span>
-      </div>
+      <img class="permission-cloud" src="cloud.png" alt="" aria-hidden="true" />
 
       <div class="permission-card">
         <p id="permissionTitle">do you want to allow<br>webcam access?</p>
@@ -459,6 +378,7 @@
     const eyeSize = document.getElementById("eyeSize");
     const faceSize = document.getElementById("faceSize");
     const filterCards = document.querySelectorAll(".filter-card");
+    const scaleControls = document.querySelectorAll("[data-scale-control]");
     const permissionOverlay = document.getElementById("permissionOverlay");
     const permissionCard = document.querySelector(".permission-card");
     const permissionTitle = document.getElementById("permissionTitle");
@@ -490,7 +410,14 @@
       filterCards.forEach((card) => {
         card.classList.toggle("active", card.dataset.filter === filter);
       });
+      updateScaleControls();
     };
+
+    function updateScaleControls() {
+      scaleControls.forEach((control) => {
+        control.classList.toggle("hidden", control.dataset.scaleControl !== currentFilter);
+      });
+    }
 
     function showPermissionPopup(mode, filter = null) {
       permissionMode = mode;
@@ -552,6 +479,7 @@
     faceSize.addEventListener("change", syncSliderValues);
 
     syncSliderValues();
+    updateScaleControls();
 
     allowCamera.addEventListener("click", () => {
       hidePermissionPopup();

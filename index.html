@@ -149,6 +149,25 @@
       border-width: 2px;
     }
 
+    .cloud-image {
+      position: absolute;
+      left: 3%;
+      right: 2%;
+      bottom: 9%;
+      z-index: 2;
+      width: 95%;
+      height: auto;
+      filter: drop-shadow(0 30px 20px rgba(104, 118, 148, 0.28));
+    }
+
+    .cloud-stage.small .cloud-image {
+      left: 0;
+      right: auto;
+      bottom: 6%;
+      width: 100%;
+      filter: drop-shadow(0 12px 10px rgba(104, 118, 148, 0.22));
+    }
+
     .contour {
       position: absolute;
       inset: 2% 0 0 0;
@@ -554,18 +573,7 @@
       <div class="contour"></div>
       <div class="contour"></div>
       <div class="contour"></div>
-      <div class="cloud">
-        <span class="puff-main"></span>
-        <span class="puff-left"></span>
-        <span class="puff-right"></span>
-        <span class="puff-top"></span>
-        <span class="puff-base"></span>
-        <div class="face">
-          <span class="eye left"></span>
-          <span class="eye right"></span>
-          <span class="mouth"></span>
-        </div>
-      </div>
+      <img class="cloud-image" src="cloud.png" alt="" />
     </section>
   </main>
 
@@ -577,18 +585,7 @@
         <div class="contour"></div>
         <div class="contour"></div>
         <div class="contour"></div>
-        <div class="cloud">
-          <span class="puff-main"></span>
-          <span class="puff-left"></span>
-          <span class="puff-right"></span>
-          <span class="puff-top"></span>
-          <span class="puff-base"></span>
-          <div class="face">
-            <span class="eye left"></span>
-            <span class="eye right"></span>
-            <span class="mouth"></span>
-          </div>
-        </div>
+        <img class="cloud-image" src="cloud.png" alt="" />
       </div>
 
       <div class="info-copy">
@@ -612,18 +609,7 @@
           <div class="contour"></div>
           <div class="contour"></div>
           <div class="contour"></div>
-          <div class="cloud">
-            <span class="puff-main"></span>
-            <span class="puff-left"></span>
-            <span class="puff-right"></span>
-            <span class="puff-top"></span>
-            <span class="puff-base"></span>
-            <div class="face">
-              <span class="eye left"></span>
-              <span class="eye right"></span>
-              <span class="mouth"></span>
-            </div>
-          </div>
+          <img class="cloud-image" src="cloud.png" alt="" />
         </div>
       </div>
 
