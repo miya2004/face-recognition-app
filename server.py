@@ -48,9 +48,19 @@ def append_survey_row(payload: dict) -> None:
             writer.writerow(row)
 
 
+ASSET_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
+
+
 class SurveyHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
+
+    def end_headers(self) -> None:
+        path = urlparse(self.path).path
+        if path.startswith("/assets/") and Path(path).suffix.lower() in ASSET_EXTENSIONS:
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+        super().end_headers()
 
     def do_OPTIONS(self) -> None:
         self.send_response(204)

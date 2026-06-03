@@ -6,6 +6,15 @@ function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+function withCacheBust(url, version) {
+  if (!url || !version) {
+    return url;
+  }
+
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}v=${encodeURIComponent(version)}`;
+}
+
 function createLine(text, className = "intro__line") {
   const el = document.createElement("span");
   el.className = className;
@@ -117,7 +126,7 @@ export function showOutro(slides) {
 
         const qrImg = document.createElement("img");
         qrImg.className = "outro__qr";
-        qrImg.src = slide.qrImage;
+        qrImg.src = withCacheBust(slide.qrImage, CONFIG.outro?.qrCacheBust);
         qrImg.alt = slide.qrAlt || "QR code";
         qrImg.decoding = "async";
 

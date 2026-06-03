@@ -23,7 +23,9 @@ export const CONFIG = {
     templateIds: null
   },
   outro: {
-    slideDurationMs: 6500
+    slideDurationMs: 6500,
+    // Bump when you replace assets/face-recognition-effects-qr.png
+    qrCacheBust: "2"
   },
   survey: {
     submitUrl: "/api/survey"
