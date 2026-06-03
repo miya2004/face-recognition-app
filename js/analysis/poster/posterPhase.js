@@ -215,14 +215,14 @@ export function createPosterPhase(options) {
     visible = false;
   }
 
-  function continueToOutro() {
+  async function continueToOutro() {
     if (!stageEl?.classList.contains("poster-stage--await-continue")) {
       return;
     }
     sequenceAbort = true;
     setOverviewMode(false);
     hideStage();
-    onContinue?.();
+    await onContinue?.();
   }
 
   continueBtn?.addEventListener("click", continueToOutro);

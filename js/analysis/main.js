@@ -13,6 +13,9 @@ import {
 import { startPulseScheduler, stopPulseScheduler } from "./pulse.js";
 import { showOutro } from "./outro.js";
 import { OUTRO_SLIDES } from "./outroSlides.js";
+import { showSurvey } from "./survey.js";
+import { SURVEY_QUESTIONS } from "./surveyQuestions.js";
+import { submitSurveyAnswers } from "./surveyExport.js";
 import { showDataDisposal } from "./dataDisposal.js";
 import { createPosterPhase } from "./poster/posterPhase.js";
 import { POSTER_TEMPLATES } from "./poster/templates.js";
@@ -67,7 +70,7 @@ const posterPhase = createPosterPhase({
   prevBtn: document.getElementById("posterPrev"),
   continueBtn: document.getElementById("posterContinue"),
   templates: posterTemplates,
-  onContinue: beginOutroPhase
+  onContinue: beginSurveyPhase
 });
 
 function setAtmosphere(mode) {
@@ -290,6 +293,16 @@ async function beginPosterPhase() {
 
   posterAttemptCount = 0;
   mirror?.classList.add("mirror--poster-hidden");
+}
+
+async function beginSurveyPhase() {
+  phase = "survey";
+  mirror?.classList.add("mirror--poster-hidden");
+  document.getElementById("posterStage")?.classList.add("poster-stage--hidden");
+
+  const answers = await showSurvey(SURVEY_QUESTIONS);
+  await submitSurveyAnswers(answers);
+  await beginOutroPhase();
 }
 
 async function beginOutroPhase() {

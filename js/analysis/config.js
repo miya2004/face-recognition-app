@@ -24,5 +24,8 @@ export const CONFIG = {
   },
   outro: {
     slideDurationMs: 6500
+  },
+  survey: {
+    submitUrl: "/api/survey"
   }
 };
