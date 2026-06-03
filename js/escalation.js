@@ -65,6 +65,16 @@ const FINALE_STAGGER_MS = 160;
 const FINALE_HOLD_MS = 3500;
 
 let popupSerial = 0;
+let referenceCloud = null;
+
+function getReferenceCloud() {
+  if (referenceCloud) {
+    return referenceCloud;
+  }
+
+  referenceCloud = document.querySelector("#permissionOverlay .permission-cloud");
+  return referenceCloud;
+}
 
 function randomOffset(index) {
   const spread = Math.min(20 + index * 5, 80);
@@ -74,29 +84,52 @@ function randomOffset(index) {
   };
 }
 
-function buildPopupHtml(prompt) {
-  return `
-    <div class="permission-popup escalation-popup__card" role="dialog" aria-modal="true">
-      <div class="permission-cloud" aria-hidden="true">
-        <div class="cloud-swirl"></div>
-        <span class="cloud-part one"></span>
-        <span class="cloud-part two"></span>
-        <span class="cloud-part three"></span>
-        <span class="cloud-part four"></span>
-        <span class="cloud-face">👀<br>👄</span>
-      </div>
-      <div class="permission-card terms">
-        <p>
-          <span class="terms-title">do you want to allow ${prompt.title}?</span>
-          ${prompt.body}
-        </p>
-        <div class="permission-actions">
-          <button type="button" class="permission-action escalation-allow">allow</button>
-          <button type="button" class="permission-action deny escalation-deny">don't allow</button>
-        </div>
-      </div>
-    </div>
-  `;
+function buildPopupCard(prompt) {
+  const card = document.createElement("div");
+  card.className = "permission-popup";
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true");
+
+  const cloudSource = getReferenceCloud();
+  if (cloudSource) {
+    card.appendChild(cloudSource.cloneNode(true));
+  } else {
+    const cloud = document.createElement("img");
+    cloud.className = "permission-cloud";
+    cloud.src = "cloud.png";
+    cloud.alt = "";
+    cloud.setAttribute("aria-hidden", "true");
+    card.appendChild(cloud);
+  }
+
+  const permissionCard = document.createElement("div");
+  permissionCard.className = "permission-card terms";
+
+  const text = document.createElement("p");
+  const title = document.createElement("span");
+  title.className = "terms-title";
+  title.textContent = `do you want to allow ${prompt.title}?`;
+  text.appendChild(title);
+  text.append(` ${prompt.body}`);
+
+  const actions = document.createElement("div");
+  actions.className = "permission-actions";
+
+  const allowBtn = document.createElement("button");
+  allowBtn.type = "button";
+  allowBtn.className = "permission-action escalation-allow";
+  allowBtn.textContent = "allow";
+
+  const denyBtn = document.createElement("button");
+  denyBtn.type = "button";
+  denyBtn.className = "permission-action deny escalation-deny";
+  denyBtn.textContent = "don't allow";
+
+  actions.append(allowBtn, denyBtn);
+  permissionCard.append(text, actions);
+  card.append(permissionCard);
+
+  return card;
 }
 
 function createPopup(layer, prompt) {
@@ -109,7 +142,7 @@ function createPopup(layer, prompt) {
   popup.style.setProperty("--offset-x", `${offset.x}px`);
   popup.style.setProperty("--offset-y", `${offset.y}px`);
   popup.style.zIndex = String(20 + index);
-  popup.innerHTML = buildPopupHtml(prompt);
+  popup.appendChild(buildPopupCard(prompt));
 
   const remove = () => {
     popup.classList.add("escalation-popup--leaving");

@@ -705,6 +705,24 @@ body.outro-active {
   min-height: 2.5rem;
 }
 
+.outro__credits {
+  margin: 0;
+  max-width: min(40rem, 92vw);
+  font-size: clamp(0.78rem, 1.35vw, 0.95rem);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-wrap: balance;
+  color: rgba(245, 245, 245, 0.62);
+  opacity: 0;
+  animation: intro-emerge 2.2s cubic-bezier(0.16, 1, 0.3, 1) 2.55s forwards;
+}
+
+.intro--leaving .outro__credits {
+  animation: intro-recede 1.15s cubic-bezier(0.55, 0, 0.85, 0.36) forwards;
+  animation-delay: 0.18s;
+}
+
 .outro__timer {
   position: absolute;
   left: 50%;

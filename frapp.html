@@ -157,6 +157,12 @@
       pointer-events: none;
     }
 
+    .escalation-layer,
+    .escalation-popup,
+    .escalation-popup .permission-popup {
+      overflow: visible;
+    }
+
     .escalation-popup {
       position: fixed;
       left: 50%;
@@ -181,9 +187,19 @@
         scale(0.88);
     }
 
-    .escalation-popup__card {
+    .escalation-popup .permission-popup {
       position: relative;
       width: 100%;
+    }
+
+    .escalation-popup .permission-cloud {
+      position: absolute;
+      left: -20px;
+      top: -64px;
+      width: 180px;
+      height: auto;
+      filter: drop-shadow(0 12px 10px rgba(84, 91, 113, 0.25));
+      pointer-events: none;
     }
 
     body.escalation-started .app {
@@ -366,7 +382,7 @@
       FaceLandmarker,
       FilesetResolver
     } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
-    import { startEscalation } from "./js/escalation.js";
+    import { startEscalation } from "./js/escalation.js?v=3";
 
     const video = document.getElementById("webcam");
     const canvas = document.getElementById("canvas");

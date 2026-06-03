@@ -83,7 +83,11 @@ class SurveyHandler(SimpleHTTPRequestHandler):
             self.send_error(500, f"Could not write CSV: {error}")
             return
 
-        response = json.dumps({"ok": True, "path": str(CSV_PATH.name)}).encode("utf-8")
+        print(f"Survey row appended → {CSV_PATH.resolve()}")
+
+        response = json.dumps(
+            {"ok": True, "path": str(CSV_PATH.relative_to(ROOT))}
+        ).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(response)))

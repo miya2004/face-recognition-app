@@ -21,9 +21,15 @@ python3 server.py
 
 Then open [http://127.0.0.1:5173/index.html](http://127.0.0.1:5173/index.html)
 
-Responses are appended to `data/survey-responses.csv` — one row per visitor.
+Responses are appended to:
 
-> **Note:** `python3 -m http.server` only serves files; it does **not** record survey answers.
+`face-recognition-app/data/survey-responses.csv`
+
+(one row per visitor). The file is created on first submission and can be committed to git.
+
+While `server.py` is running, each save is also printed in the terminal with the full path.
+
+> **Note:** `python3 -m http.server` only serves files; it does **not** record survey answers. If the server is not running, the browser downloads a one-row CSV as a fallback so answers are not lost.
 
 ## Survey CSV columns
 

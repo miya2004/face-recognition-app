@@ -132,6 +132,14 @@ export function showOutro(slides) {
         button.textContent = slide.button;
         button.addEventListener("click", finish);
         footerEl.appendChild(button);
+
+        if (slide.credits) {
+          const credits = document.createElement("p");
+          credits.className = "outro__credits";
+          credits.textContent = slide.credits;
+          footerEl.appendChild(credits);
+        }
+
         window.setTimeout(() => button.focus(), 400);
         return;
       }

@@ -1,35 +1,38 @@
 export const OUTRO_SLIDES = [
   {
-    title: "That was your real face.",
+    title: "This is not a gimmick.",
     lines: [
-      "We took it from your camera and put it into scenes you never walked into — in seconds."
+      "From a single camera view, systems can estimate age, mood, identity cues, and more — without asking you again.",
+      "That data is valuable. And it is being collected in the wild, right now."
     ],
-    durationMs: 7000
+    durationMs: 8000
   },
   {
-    title: "Anyone could do this.",
+    title: "Your face can be weaponized.",
     lines: [
-      "A billboard. A CCTV feed. A post online.",
-      "It looks real. But the context is fake."
+      "Deepfakes, fake IDs, stalking, discriminatory profiling, and ads that follow you — often built from images you never meant to share.",
+      "Once your face is copied, you cannot take it back."
     ],
-    durationMs: 7500
+    durationMs: 8500
   },
   {
-    title: "And it spreads fast.",
+    title: "The risk is real and growing.",
     lines: [
-      "Once your face is out there, you don't choose where it goes next.",
-      "This demo stayed on your device. Most apps don't."
+      "Billboards, security feeds, social posts, and “fun” filters all train the same pipeline: capture, analyze, reuse.",
+      "This demo ran locally. Most products do not — and they rarely tell you where your face goes next."
     ],
-    durationMs: 7500
+    durationMs: 8500
   },
   {
-    title: "Your data. Your face. Your choice.",
+    title: "See the full picture.",
     lines: [
-      "Want to learn what actually happens to your data — and how to protect yourself?",
-      "Scan this code to open the full presentation."
+      "If this felt uncomfortable, that reaction is the point.",
+      "Scan the code for our presentation on face recognition harms — and what you can do to push back."
     ],
     qrImage: "./assets/face-recognition-effects-qr.png",
     qrAlt: "QR code — Face Recognition Effects presentation",
-    button: "Finish"
+    button: "Finish",
+    credits:
+      "Created for Night of the Nerds by Gabi, Erika, Miya, Sao, and Aleksa — with guidance from Jacqueline Pijcke."
   }
 ];
