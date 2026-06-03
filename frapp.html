@@ -102,6 +102,10 @@
       font-weight: bold;
     }
 
+    .slider-row.hidden {
+      display: none;
+    }
+
     .slider-row input {
       flex: 1;
       accent-color: hotpink;
@@ -325,15 +329,15 @@
       </div>
 
       <p id="message">Opening camera...</p>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="plumpLip">
         <span>Lips</span>
         <input id="lipSize" type="range" min="0" max="100" value="0" />
       </label>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="bigEyes">
         <span>Eyes</span>
         <input id="eyeSize" type="range" min="0" max="100" value="0" />
       </label>
-      <label class="slider-row">
+      <label class="slider-row" data-scale-control="softGlam">
         <span>Face</span>
         <input id="faceSize" type="range" min="0" max="100" value="35" />
       </label>
@@ -374,6 +378,7 @@
     const eyeSize = document.getElementById("eyeSize");
     const faceSize = document.getElementById("faceSize");
     const filterCards = document.querySelectorAll(".filter-card");
+    const scaleControls = document.querySelectorAll("[data-scale-control]");
     const permissionOverlay = document.getElementById("permissionOverlay");
     const permissionCard = document.querySelector(".permission-card");
     const permissionTitle = document.getElementById("permissionTitle");
@@ -405,7 +410,14 @@
       filterCards.forEach((card) => {
         card.classList.toggle("active", card.dataset.filter === filter);
       });
+      updateScaleControls();
     };
+
+    function updateScaleControls() {
+      scaleControls.forEach((control) => {
+        control.classList.toggle("hidden", control.dataset.scaleControl !== currentFilter);
+      });
+    }
 
     function showPermissionPopup(mode, filter = null) {
       permissionMode = mode;
@@ -467,6 +479,7 @@
     faceSize.addEventListener("change", syncSliderValues);
 
     syncSliderValues();
+    updateScaleControls();
 
     allowCamera.addEventListener("click", () => {
       hidePermissionPopup();
