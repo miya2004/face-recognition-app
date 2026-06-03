@@ -1,4 +1,4 @@
-const PLAY_MS = 30_000;
+const PLAY_MS = 15_000;
 
 const ESCALATION_PROMPTS = [
   {
